@@ -113,7 +113,7 @@ const foto = (f) => 'data:image/jpeg;base64,' + readFileSync(at('img/' + f)).toS
 const FOTOS = `window.FOTOS = {
   manuela: ${JSON.stringify(foto('manuela.jpg'))},
   cardoso: ${JSON.stringify(foto('cardoso.jpg'))},
-  eiffel:  ${JSON.stringify(foto('eiffel-banda.jpg'))}
+  eiffel:  ${JSON.stringify(foto('eiffel.jpg'))}
 };`;
 
 /* 5 · montaje final. puzzles.js va tal cual, arriba y editable. */

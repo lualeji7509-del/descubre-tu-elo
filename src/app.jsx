@@ -71,6 +71,8 @@ const T = {
     navHistory: 'Historia',
     photoCaption: 'Manuela y José Gabriel, partida improvisada bajo la Torre Eiffel.',
     photoCredit: 'De sus perfiles de Instagram',
+    photoQuote: '¿Me aceptas una partida en la Torre Eiffel?',
+    photoQuoteBy: 'José Gabriel, en el pie de la foto',
     historyTitle: 'Mates con siglos de historia',
     historyLead: 'Los patrones de este test no se inventaron ayer. Cada uno tiene nombre, fecha y autor.',
     tipsTitle: 'Cinco consejos para subir de nivel',
@@ -209,6 +211,8 @@ const T = {
     navHistory: 'History',
     photoCaption: 'Manuela and José Gabriel, an impromptu game under the Eiffel Tower.',
     photoCredit: 'From their Instagram profiles',
+    photoQuote: 'Care for a game at the Eiffel Tower?',
+    photoQuoteBy: 'José Gabriel, in the photo caption',
     historyTitle: 'Checkmates with centuries behind them',
     historyLead:
       'The patterns in this test were not invented yesterday. Each one has a name, a date and an author.',
@@ -948,19 +952,22 @@ function App() {
 
         {/* ─── LOS DOS, JUGANDO ─── */}
         {(window.FOTOS || {}).eiffel && (
-          <figure className="reveal mt-14 sm:mt-20">
-            {/* object-bottom: lo que importa está abajo, donde está el tablero */}
-            <div className="overflow-hidden ring-1 ring-line">
-              <img
-                src={window.FOTOS.eiffel}
-                alt={t.photoCaption}
-                loading="lazy"
-                className="w-full object-cover object-bottom max-h-[22rem] sm:max-h-[30rem]"
-              />
-            </div>
-            <figcaption className="mt-3 flex flex-wrap items-baseline justify-between gap-2">
-              <p className="text-sm text-ivory/55">{t.photoCaption}</p>
-              <p className="t-label text-ivory/30">{t.photoCredit}</p>
+          <figure className="reveal mt-16 sm:mt-24 grid sm:grid-cols-[1fr_1fr] gap-6 sm:gap-10 items-center">
+            {/* la foto va entera, sin recortar */}
+            <img
+              src={window.FOTOS.eiffel}
+              alt={t.photoCaption}
+              loading="lazy"
+              className="w-full h-auto ring-1 ring-line"
+            />
+            <figcaption className="sm:pr-4">
+              <span className="rule-checker w-24 block"></span>
+              <blockquote className="display text-2xl sm:text-3xl font-black leading-tight mt-5 balance">
+                «{t.photoQuote}»
+              </blockquote>
+              <p className="t-label text-gold mt-3">{t.photoQuoteBy}</p>
+              <p className="mt-6 text-sm text-ivory/55 leading-relaxed">{t.photoCaption}</p>
+              <p className="mt-3 t-label text-ivory/30">{t.photoCredit}</p>
             </figcaption>
           </figure>
         )}
