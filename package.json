@@ -1,0 +1,18 @@
+{
+  "name": "descubre-tu-elo",
+  "version": "1.0.0",
+  "description": "Descubre tu ELO con los Maestros — quiz de ajedrez con tablero jugable",
+  "private": true,
+  "scripts": {
+    "verify": "node verify.mjs",
+    "build": "node build.mjs",
+    "check": "node verify.mjs && node build.mjs"
+  },
+  "devDependencies": {
+    "chess.js": "^1.4.0",
+    "esbuild": "^0.25.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.19"
+  }
+}
