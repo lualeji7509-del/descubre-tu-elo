@@ -783,7 +783,7 @@ function App() {
       ig: IG_WFM,
       fide: FIDE_WFM,
       piece: 'n',
-      accent: 'text-emerald-300',
+      accent: 'text-gold',
       foto: (window.FOTOS || {}).manuela,
     },
     {
@@ -796,7 +796,7 @@ function App() {
       ig: IG_GM,
       fide: null,
       piece: 'q',
-      accent: 'text-amber-300',
+      accent: 'text-gold',
       foto: (window.FOTOS || {}).cardoso,
     },
   ];
