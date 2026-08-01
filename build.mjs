@@ -32,10 +32,20 @@ const tmp = mkdtempSync(join(tmpdir(), 'tw-'));
 writeFileSync(join(tmp, 'in.css'), '@tailwind base;@tailwind components;@tailwind utilities;');
 writeFileSync(join(tmp, 'cfg.js'), `module.exports = {
   content: ['${at('src/app.jsx')}'],
-  theme: { extend: { colors: {
-    board: { light: '#e9d7b7', dark: '#8a6a4a' },
-    ink: '#0b1220', panel: '#16233a', gold: '#e2b23c',
-  } } },
+  theme: { extend: {
+    colors: {
+      board: { light: '#e9dcc0', dark: '#8a6a4a' },
+      ink: '#08090c',          /* fondo, casi negro */
+      panel: '#12141a',        /* superficies */
+      line: '#23262f',         /* separadores */
+      ivory: '#efe9dc',        /* texto principal */
+      gold: '#d9a441',         /* latón, el acento */
+      ember: '#e4572e',        /* rojo torneo, muy puntual */
+    },
+    fontFamily: {
+      display: ["'Iowan Old Style'", "'Palatino Linotype'", 'Palatino', 'Georgia', 'serif'],
+    },
+  } },
 };`);
 execFileSync(at('node_modules/.bin/tailwindcss'),
   ['-c', join(tmp, 'cfg.js'), '-i', join(tmp, 'in.css'), '-o', join(tmp, 'out.css'), '--minify'],
@@ -43,20 +53,59 @@ execFileSync(at('node_modules/.bin/tailwindcss'),
 
 /* 4 · estilos propios */
 const css = `
-html { -webkit-tap-highlight-color: transparent; }
+html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
 body {
-  background: radial-gradient(1200px 800px at 50% -10%, #1d3157 0%, #0b1220 60%);
-  color: #f1f5f9; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  background: #08090c;
+  color: #efe9dc;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
-.display { font-family: 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif; letter-spacing: -.015em; }
+
+/* Retícula 8x8 de fondo: el tablero como motivo, no como adorno. */
+.checker-bg::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image:
+    linear-gradient(45deg, rgba(217,164,65,.030) 25%, transparent 25%, transparent 75%, rgba(217,164,65,.030) 75%),
+    linear-gradient(45deg, rgba(217,164,65,.030) 25%, transparent 25%, transparent 75%, rgba(217,164,65,.030) 75%);
+  background-size: 128px 128px;
+  background-position: 0 0, 64px 64px;
+  mask-image: radial-gradient(120% 80% at 50% 0%, #000 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(120% 80% at 50% 0%, #000 0%, transparent 70%);
+}
+
+/* Tipografía: escala fluida y contraste grande entre titular y texto. */
+.display { font-family: 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif; }
+.t-hero   { font-size: clamp(2.9rem, 13vw, 6.5rem); line-height: .92; letter-spacing: -.03em; }
+.t-huge   { font-size: clamp(3.6rem, 18vw, 7rem);  line-height: .88; letter-spacing: -.04em; }
+.t-sec    { font-size: clamp(1.7rem, 6vw, 2.6rem); line-height: 1.05; letter-spacing: -.02em; }
+.t-label  { font-size: .66rem; letter-spacing: .32em; text-transform: uppercase; font-weight: 700; }
+.balance  { text-wrap: balance; }
+
+/* Filete decorativo con las casillas del tablero. */
+.rule-checker {
+  height: 6px;
+  background-image: linear-gradient(90deg, #d9a441 50%, transparent 50%);
+  background-size: 12px 6px;
+  opacity: .5;
+}
+
+/* Aparición al hacer scroll. */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.3,1); }
+.reveal.on { opacity: 1; transform: none; }
+
 .piece { line-height: 1; user-select: none; pointer-events: none; }
-.piece-w { color: #fdfdfd; text-shadow: 0 0 1px #000, 0 1px 2px rgba(0,0,0,.55), 0 0 3px rgba(0,0,0,.9); }
-.piece-b { color: #17202e; text-shadow: 0 0 1px rgba(255,255,255,.35), 0 1px 2px rgba(0,0,0,.35); }
-button:focus-visible { outline: 3px solid #e2b23c; outline-offset: 2px; }
+button:focus-visible, a:focus-visible { outline: 3px solid #d9a441; outline-offset: 3px; }
+
 @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
 .animate-shake { animation: shake .25s ease-in-out; }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+@keyframes pulseGold { 0%,100%{opacity:.35} 50%{opacity:.9} }
+.pulse-gold { animation: pulseGold 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+}
 `;
 
 /* 5 · montaje final. puzzles.js va tal cual, arriba y editable. */
