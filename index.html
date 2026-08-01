@@ -298,10 +298,14 @@ https://github.com/shaack/cm-chessboard
             theme y explain llevan las dos versiones: { es: '...', en: '...' }
             theme and explain both carry two versions: { es: '...', en: '...' }
 
-   ── COMPROBAR QUE NO TE EQUIVOCASTE / CHECK YOUR PUZZLES ────────────────
-   En la carpeta del proyecto:  node elo-maestros/verify.mjs
-   El programa revisa que cada jugada sea legal y que los mates sean mate.
-   It checks that every move is legal and that every claimed mate really is one.
+   ── AL GUARDAR NO HAY QUE HACER NADA MÁS / NOTHING ELSE TO DO ───────────
+   Al guardar los cambios, un motor de ajedrez revisa TODOS los puzzles y,
+   sólo si están bien, la web se publica sola en un par de minutos. Si algo
+   está mal, la web se queda como estaba y te llega un aviso. No se puede
+   romper nada. Guía completa: GUIA.md
+   On save, a chess engine checks EVERY puzzle and only then publishes the
+   site, in a couple of minutes. If something is wrong the site is left
+   untouched and you get a notice. Nothing can break. See GUIA.md
    ========================================================================== */
 
 const PUZZLES = [
