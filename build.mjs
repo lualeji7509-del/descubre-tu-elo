@@ -108,6 +108,14 @@ button:focus-visible, a:focus-visible { outline: 3px solid #d9a441; outline-offs
 }
 `;
 
+/* 4b · fotos incrustadas: la página sigue sin pedir nada a la red */
+const foto = (f) => 'data:image/jpeg;base64,' + readFileSync(at('img/' + f)).toString('base64');
+const FOTOS = `window.FOTOS = {
+  manuela: ${JSON.stringify(foto('manuela.jpg'))},
+  cardoso: ${JSON.stringify(foto('cardoso.jpg'))},
+  eiffel:  ${JSON.stringify(foto('eiffel-banda.jpg'))}
+};`;
+
 /* 5 · montaje final. puzzles.js va tal cual, arriba y editable. */
 writeFileSync(at('index.html'), `<!DOCTYPE html>
 <html lang="es">
@@ -124,6 +132,7 @@ writeFileSync(at('index.html'), `<!DOCTYPE html>
 <script>
 ${readFileSync(at('puzzles.js'), 'utf8')}
 </script>
+<script>${FOTOS}</script>
 <script>${readFileSync(at('node_modules/react/umd/react.production.min.js'), 'utf8')}</script>
 <script>${readFileSync(at('node_modules/react-dom/umd/react-dom.production.min.js'), 'utf8')}</script>
 <script>${chessOut.outputFiles[0].text}</script>
