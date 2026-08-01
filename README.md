@@ -88,6 +88,21 @@ combinaciones clásicas elegidas para el proyecto. Ellos aparecen como
 protagonistas y como referencia de nivel.
 
 Dentro de `index.html` van incrustados [React](https://react.dev),
-[Tailwind CSS](https://tailwindcss.com) y el motor
-[chess.js](https://github.com/jhlywa/chess.js), así que la página no hace
-ninguna petición a internet.
+[Tailwind CSS](https://tailwindcss.com), el motor
+[chess.js](https://github.com/jhlywa/chess.js) y el juego de piezas, así que la
+página no hace ninguna petición a internet.
+
+## Créditos
+
+Las piezas son el juego **Cburnett**, el mismo que usa Lichess. Obra de
+[Cburnett](https://en.wikipedia.org/wiki/User:Cburnett) y
+[Rfc1394](https://en.wikipedia.org/wiki/User:Rfc1394) en
+[Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces/Standard),
+bajo licencia [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
+El sprite viene empaquetado por
+[cm-chessboard](https://github.com/shaack/cm-chessboard) (MIT) y está en
+`img/piezas-cburnett.svg` con su cabecera de licencia intacta.
+
+La licencia es gratuita y permite uso comercial. Sólo exige dos cosas: citar a
+los autores (hecho aquí y en el pie de la web) y que si alguien modifica las
+piezas, las publique bajo la misma licencia.

@@ -108,7 +108,14 @@ button:focus-visible, a:focus-visible { outline: 3px solid #d9a441; outline-offs
 }
 `;
 
-/* 4b · fotos incrustadas: la página sigue sin pedir nada a la red */
+/* 4b · piezas de ajedrez (juego Cburnett, el de Lichess).
+       Se incrusta el sprite entero una vez y cada casilla lo referencia
+       con <use href="#wk">. La cabecera del archivo lleva la licencia. */
+const PIEZAS = readFileSync(at('img/piezas-cburnett.svg'), 'utf8')
+  .replace(/<\?xml[^>]*\?>/, '')
+  .replace('<svg ', '<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" ');
+
+/* 4c · fotos incrustadas: la página sigue sin pedir nada a la red */
 const foto = (f) => 'data:image/jpeg;base64,' + readFileSync(at('img/' + f)).toString('base64');
 const FOTOS = `window.FOTOS = {
   manuela: ${JSON.stringify(foto('manuela.jpg'))},
@@ -128,6 +135,7 @@ writeFileSync(at('index.html'), `<!DOCTYPE html>
 <style>${css}</style>
 </head>
 <body>
+${PIEZAS}
 <div id="root"></div>
 <script>
 ${readFileSync(at('puzzles.js'), 'utf8')}

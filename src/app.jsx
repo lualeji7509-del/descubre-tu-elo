@@ -1,8 +1,6 @@
 /* Descubre tu ELO con los Maestros — lógica y secciones de la aplicación.
   Los puzzles NO están aquí: están en puzzles.js (o arriba del todo del index.html). */
 
-import { PIECE_PATHS, STROKE_ONLY } from './pieces.js';
-
 const { useState, useMemo, useRef, useEffect, useCallback } = React;
 const { Chess } = ChessLib;
 
@@ -78,6 +76,7 @@ const T = {
     tipsTitle: 'Cinco consejos para subir de nivel',
     tipsLead: 'Lo que de verdad mueve la aguja cuando quieres mejorar.',
 
+    piecesCredit: 'Piezas de ajedrez de Cburnett y Rfc1394 (Wikimedia Commons), CC BY-SA 3.0.',
     footerNote:
       'Resultado orientativo y con fines divulgativos: no es un ELO oficial FIDE. Los ejercicios son patrones clásicos elegidos para este proyecto.',
 
@@ -219,6 +218,7 @@ const T = {
     tipsTitle: 'Five ways to actually improve',
     tipsLead: 'What really moves the needle when you want to get better.',
 
+    piecesCredit: 'Chess pieces by Cburnett and Rfc1394 (Wikimedia Commons), CC BY-SA 3.0.',
     footerNote:
       'Indicative result for entertainment: this is not an official FIDE rating. The exercises are classic patterns chosen for this project.',
 
@@ -322,18 +322,14 @@ function shuffle(arr) {
 
 /* ════════════════════════════════ PIEZA ═══════════════════════════════════ */
 
-function Piece({ type, color, className = 'w-[88%] h-[88%]' }) {
-  const paths = PIECE_PATHS[type] || [];
-  const outline = STROKE_ONLY[type] || [];
-  const fill = color === 'w' ? '#f6f2e8' : '#16222e';
-  const line = color === 'w' ? '#0d1620' : '#b9c8d8';
+/* Las piezas son el juego Cburnett, el mismo que usan Lichess y los maestros
+   en sus publicaciones. El sprite va incrustado una vez en el HTML y aquí
+   sólo se referencia. Autores y licencia: ver el pie de la página. */
+function Piece({ type, color, className = 'w-[92%] h-[92%]' }) {
+  const id = color + type; // wk, bq, wn...
   return (
-    <svg viewBox="0 0 45 45" className={'pointer-events-none ' + className} aria-hidden="true">
-      <g stroke={line} strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round">
-        {paths.map((d, i) => (
-          <path key={i} d={d} fill={outline.includes(i) ? 'none' : fill} />
-        ))}
-      </g>
+    <svg viewBox="0 0 40 40" className={'pointer-events-none ' + className} aria-hidden="true">
+      <use href={'#' + id} xlinkHref={'#' + id} />
     </svg>
   );
 }
@@ -1192,6 +1188,17 @@ function App() {
             ))}
           </div>
           <p className="mt-5 text-[11px] text-ivory/35 max-w-md mx-auto leading-relaxed">{t.footerNote}</p>
+          <p className="mt-3 text-[11px] text-ivory/25 max-w-md mx-auto leading-relaxed">
+            {t.piecesCredit}{' '}
+            <a
+              href="https://creativecommons.org/licenses/by-sa/3.0/"
+              target="_blank"
+              rel="noopener noreferrer license"
+              className="underline hover:text-gold transition"
+            >
+              CC BY-SA 3.0
+            </a>
+          </p>
         </footer>
       </main>
 
