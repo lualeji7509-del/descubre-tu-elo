@@ -68,6 +68,9 @@ const T = {
     changeLevel: 'Cambiar de nivel',
 
     navHistory: 'Historia',
+    showMove: 'Ver la combinación',
+    hideMove: 'Ocultar',
+    spoiler: 'Ojo: enseña la solución.',
     navClasses: 'Clases',
     navLive: 'En directo',
     ctaBook: 'Agenda tu clase',
@@ -241,6 +244,9 @@ const T = {
     changeLevel: 'Change level',
 
     navHistory: 'History',
+    showMove: 'See the combination',
+    hideMove: 'Hide',
+    spoiler: 'Heads up: this shows the solution.',
     navClasses: 'Lessons',
     navLive: 'Live',
     ctaBook: 'Book a lesson',
@@ -831,6 +837,10 @@ function App() {
     [all],
   );
   const norm = (s) => s.toLowerCase().replace(/['’]/g, '').replace(/\s+/g, ' ').trim();
+
+  /* Qué patrón de la sección de historia se está mostrando en tablero. */
+  const [verPatron, setVerPatron] = useState(null);
+  const puzzleDeHistoria = (nombre) => all.find((p) => norm(p.theme[lang]) === norm(nombre));
   const heroEra = useMemo(() => {
     if (!heroPuzzle) return '';
     const h = t.history.find((x) => norm(x.name) === norm(heroPuzzle.theme[lang]));
@@ -1229,6 +1239,36 @@ function App() {
                 <div>
                   <h3 className="display text-xl font-black">{h.name}</h3>
                   <p className="mt-2 text-sm text-ivory/60 leading-relaxed max-w-prose">{h.text}</p>
+
+                  {/* Cada mate de esta lista es uno de los puzzles del test,
+                      así que se puede enseñar la combinación jugándose sola. */}
+                  {(() => {
+                    const pz = puzzleDeHistoria(h.name);
+                    if (!pz) return null;
+                    const abierto = verPatron === i;
+                    return (
+                      <>
+                        <button
+                          onClick={() => setVerPatron(abierto ? null : i)}
+                          aria-expanded={abierto}
+                          className="mt-4 inline-flex items-center gap-2 ring-1 ring-gold/40 bg-gold/10 text-gold t-label px-3 py-2 hover:bg-gold hover:text-ink transition"
+                        >
+                          {abierto ? t.hideMove : t.showMove}
+                          <span aria-hidden="true">{abierto ? '×' : '▸'}</span>
+                        </button>
+                        {!abierto && <p className="mt-2 text-[11px] text-ivory/25">{t.spoiler}</p>}
+                        {abierto && (
+                          <div className="mt-4 max-w-[330px]">
+                            <AutoBoard fen={pz.fen} moves={pz.solution} />
+                            <p className="mt-3 text-sm text-gold font-bold tabular-nums">
+                              {pz.solution.map((m) => sanFor(m, lang)).join('  ')}
+                            </p>
+                            <p className="mt-1 text-xs text-ivory/45 leading-relaxed">{pz.explain[lang]}</p>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </li>
             ))}
