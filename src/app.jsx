@@ -72,18 +72,18 @@ const T = {
     hideMove: 'Ocultar',
     spoiler: 'Ojo: enseña la solución.',
     noEsLaPartida:
-      'Posición de ejemplo, construida para que el patrón se vea claro. No es la partida histórica.',
+      'Posición de ejemplo, construida para que el patrón se vea claro. No es una partida concreta: este patrón se conoce por libros y manuscritos, no por una partida famosa.',
+    gameLabel: 'Partida',
     navClasses: 'Clases',
     navLive: 'En directo',
     ctaBook: 'Agenda tu clase',
 
     classesTitle: 'Clases y academia',
     classesLead:
-      'Manuela imparte clases de ajedrez online en español e inglés. El formato, el horario y el precio se acuerdan directamente con ella.',
+      'Los dos dan clases online, cada uno por su cuenta. El formato, el horario y el precio se acuerdan directamente con quien elijas.',
     classesNote:
       'No hay carrito ni pasarela de pago: se habla por mensaje privado y se acuerda directamente. Así de simple.',
-    askGm: '¿Prefieres preguntarle a José Gabriel?',
-    askGmCta: 'Escríbele',
+    chooseCoach: 'Escribe a quien prefieras:',
     classFormats: [
       {
         n: 'Clase individual',
@@ -152,12 +152,12 @@ const T = {
       {
         era: 'Siglo XVIII',
         name: 'Legado de Philidor',
-        text: 'François-André Danican Philidor (1726–1795) fue el mejor jugador de su tiempo y además compositor de ópera. Este mate ahogado lleva su nombre desde entonces y sigue apareciendo en partidas de hoy.',
+        text: 'Lleva el nombre de François-André Danican Philidor (1726–1795), el mejor jugador de su tiempo y además compositor de ópera. Pero no lo inventó él: el patrón ya aparece en el libro de Lucena de 1497. Philidor lo analizó en su tratado de 1749 y fue quien lo popularizó.',
       },
       {
         era: '1803',
         name: 'Mate de Anastasia',
-        text: 'Toma el nombre del libro «Anastasia y el juego de ajedrez», de Wilhelm Heinse: una novela escrita como una serie de cartas en las que se intercalaban posiciones. Un mate bautizado por una obra literaria.',
+        text: 'Toma el nombre del libro «Anastasia y el juego de ajedrez», de Wilhelm Heinse, 1803: una novela escrita como una serie de cartas en las que se intercalaban posiciones. La posición que usó Heinse la había descrito antes Giambattista Lolli. Un mate bautizado por una novela.',
       },
       {
         era: '1853',
@@ -251,15 +251,18 @@ const T = {
     showMove: 'See the pattern',
     hideMove: 'Hide',
     spoiler: 'Heads up: this shows the solution.',
-    noEsLaPartida: 'Example position, built so the pattern reads clearly. It is not the historical game.',
+    noEsLaPartida:
+      'Example position, built so the pattern reads clearly. It is not one specific game: this pattern is known from books and manuscripts, not from a famous game.',
+    gameLabel: 'Game',
     navClasses: 'Lessons',
     navLive: 'Live',
     ctaBook: 'Book a lesson',
 
     classesTitle: 'Lessons and academy',
     classesLead:
-      'Manuela teaches chess online in Spanish and English. Format, schedule and price are agreed directly with her.',
-    classesNote: 'No cart, no checkout: you send a message and settle it with the coach. That simple.',
+      'Both teach online, each independently. Format, schedule and price are agreed directly with whoever you choose.',
+    classesNote: 'No cart, no checkout: you send a message and settle it directly. That simple.',
+    chooseCoach: 'Message whoever you prefer:',
     classFormats: [
       {
         n: 'One-to-one',
@@ -334,7 +337,7 @@ const T = {
       {
         era: '1803',
         name: "Anastasia's mate",
-        text: 'Named after the book "Anastasia and the Game of Chess" by Wilhelm Heinse: a novel written as a series of letters with chess positions woven through it. A checkmate christened by a work of literature.',
+        text: 'Named after the book "Anastasia and the Game of Chess" by Wilhelm Heinse, 1803: a novel written as a series of letters with chess positions woven through it. The position Heinse used had been described earlier by Giambattista Lolli. A checkmate christened by a novel.',
       },
       {
         era: '1853',
@@ -1158,6 +1161,11 @@ function App() {
                     <p className="mt-2 text-sm text-gold font-bold tabular-nums">
                       {puzzle.solution.map((s) => sanFor(s, lang)).join('  ')}
                     </p>
+                    {puzzle.source && (
+                      <p className="mt-1 t-label text-ivory/40">
+                        {t.gameLabel}: {puzzle.source[lang]}
+                      </p>
+                    )}
                   </>
                 )}
               </div>
@@ -1269,9 +1277,15 @@ function App() {
                               {pz.solution.map((m) => sanFor(m, lang)).join('  ')}
                             </p>
                             <p className="mt-1 text-xs text-ivory/45 leading-relaxed">{pz.explain[lang]}</p>
-                            <p className="mt-3 text-[11px] text-ivory/30 leading-relaxed border-l-2 border-line pl-3">
-                              {t.noEsLaPartida}
-                            </p>
+                            {pz.source ? (
+                              <p className="mt-3 text-[11px] text-gold/70 leading-relaxed border-l-2 border-gold/40 pl-3">
+                                {t.gameLabel}: {pz.source[lang]}
+                              </p>
+                            ) : (
+                              <p className="mt-3 text-[11px] text-ivory/30 leading-relaxed border-l-2 border-line pl-3">
+                                {t.noEsLaPartida}
+                              </p>
+                            )}
                           </div>
                         )}
                       </>
@@ -1314,20 +1328,28 @@ function App() {
                   rel="noopener noreferrer"
                   className="mt-5 text-center bg-gold/10 ring-1 ring-gold/40 text-gold text-sm font-bold py-2.5 hover:bg-gold hover:text-ink transition"
                 >
-                  {t.classCta} ↗<span className="block t-label opacity-60 mt-1">Manuela</span>
+                  {t.classCta} ↗
                 </a>
               </div>
             ))}
           </div>
           <div className="reveal mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 bg-panel ring-1 ring-line p-4">
-            <p className="text-sm text-ivory/60">{t.askGm}</p>
+            <p className="text-sm text-ivory/60 w-full">{t.chooseCoach}</p>
+            <a
+              href={`https://ig.me/m/${IG_WFM}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="t-label text-gold hover:text-ivory transition"
+            >
+              Manuela @{IG_WFM} ↗
+            </a>
             <a
               href={`https://ig.me/m/${IG_GM}`}
               target="_blank"
               rel="noopener noreferrer"
               className="t-label text-gold hover:text-ivory transition"
             >
-              {t.askGmCta} @{IG_GM} ↗
+              José Gabriel @{IG_GM} ↗
             </a>
           </div>
           <p className="reveal mt-4 text-xs text-ivory/35 max-w-xl">{t.classesNote}</p>

@@ -32,6 +32,11 @@
             They alternate: 1st = user, 2nd = opponent's reply, 3rd = user, etc.
             A single move is fine.
 
+   source   OPCIONAL. Si la posición viene de una partida real, ponla aquí:
+            { es: 'Blancas – Negras · Ciudad, año', en: '...' }
+            Si no la pones, la web avisa de que es una posición de ejemplo.
+            OPTIONAL. If the position comes from a real game, name it here.
+
    theme    Nombre corto del tema. / Short theme name.
    explain  La explicación que se muestra al acertar. / Explanation shown on success.
 
@@ -157,12 +162,15 @@ const PUZZLES = [
   {
     level: 'gm',
     rating: 2400,
-    fen: '2kr3r/pp3ppp/2n5/8/Q4B2/3B4/PPP2PPP/2KR3R w - - 0 1',
-    solution: ['Qxc6+', 'bxc6', 'Ba6#'],
+    /* Partida real: R. Schulder – S. Boden, Londres 1853, tras 14.Axd5.
+       Juegan NEGRAS. Es la partida que dio nombre al mate. */
+    fen: '2k1rb1r/ppp3pp/2n2q2/3B1b2/5P2/2P1BQ2/PP1N1P1P/2KR3R b - - 0 14',
+    solution: ['Qxc3+', 'bxc3', 'Ba3#'],
+    source: { es: 'Schulder – Boden · Londres, 1853', en: 'Schulder – Boden · London, 1853' },
     theme: { es: 'Mate de Boden', en: 'Boden’s mate' },
     explain: {
-      es: 'Se sacrifica la dama justo para obligar al peón de b7 a moverse. Con esa casilla libre, los dos alfiles se cruzan sobre el rey y no hay escapatoria.',
-      en: 'The queen is sacrificed precisely to force the b7 pawn to move. With that square vacated, the two bishops criss-cross the king and there is no way out.',
+      es: 'Se sacrifica la dama justo para obligar al peón de b2 a moverse. Con la diagonal abierta, los dos alfiles se cruzan sobre el rey blanco y no hay escapatoria. Boden remató así de verdad, en Londres en 1853.',
+      en: 'The queen is sacrificed precisely to force the b2 pawn to move. With the diagonal open, the two bishops criss-cross the white king and there is no way out. Boden really finished this way, in London in 1853.',
     },
   },
 
