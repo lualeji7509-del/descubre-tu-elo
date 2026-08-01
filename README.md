@@ -97,11 +97,20 @@ Los puzzles no fueron propuestos por Manuela ni por José Gabriel: son
 combinaciones clásicas elegidas para el proyecto. Ellos aparecen como
 protagonistas y como referencia de nivel.
 
-**Sobre la sección de historia:** los datos históricos (autores, fechas,
-orígenes) están documentados, pero **las posiciones no son las partidas
-históricas**: están construidas para que cada patrón se vea claro. La web lo
-dice al desplegar cada tablero. Si algún día se sustituyen por las partidas
-reales, hay que quitar ese aviso.
+**Sobre la sección de historia.** Los datos históricos —autores, fechas,
+orígenes— están documentados. Con las posiciones hay dos casos, y la web
+distingue uno de otro al desplegar cada tablero:
+
+| Patrón | Posición |
+|---|---|
+| Mate de Boden | **Partida real:** Schulder – Boden, Londres 1853 |
+| Mate de Anastasia | **Partida real:** Lemon – Plum, St. Paul 1982 |
+| Legado de Philidor | Posición de ejemplo. El patrón nace del libro de Lucena (1497), no de una partida. Sí ocurrió en Grischuk – Ponomariov, Torshavn 2000. |
+| Mate árabe | Posición de ejemplo. Viene de manuscritos del siglo IX, no de una partida. |
+
+Cuando un puzzle sale de una partida real, se pone en su campo `source` y la
+web la cita. Si no lo lleva, la web avisa de que es una posición de ejemplo.
+**No inventar partidas para rellenar ese campo.**
 
 Dentro de `index.html` van incrustados [React](https://react.dev),
 [Tailwind CSS](https://tailwindcss.com), el motor
