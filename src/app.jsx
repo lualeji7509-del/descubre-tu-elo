@@ -8,6 +8,7 @@ const { Chess } = ChessLib;
 const IG_WFM = 'wfm_manuchess';
 const IG_GM = 'gmcardosolab';
 const FIDE_WFM = 'https://ratings.fide.com/profile/4483103';
+const ANIO = new Date().getFullYear();
 
 /* ══════════════════════════════ TEXTOS / STRINGS ══════════════════════════ */
 
@@ -67,6 +68,38 @@ const T = {
     changeLevel: 'Cambiar de nivel',
 
     navHistory: 'Historia',
+    navClasses: 'Clases',
+    navLive: 'En directo',
+    ctaBook: 'Agenda tu clase',
+
+    classesTitle: 'Clases y academia',
+    classesLead:
+      'Manuela imparte clases de ajedrez online en español e inglés. El formato, el horario y el precio se acuerdan directamente con ella.',
+    classesNote:
+      'No hay carrito ni pasarela de pago: se habla por mensaje privado y se acuerda con la maestra. Así de simple.',
+    classFormats: [
+      {
+        n: 'Clase individual',
+        d: 'Uno a uno, con un plan hecho a tu medida a partir de tus propias partidas. El formato que más rápido sube el nivel.',
+      },
+      {
+        n: 'Clase en grupo',
+        d: 'Grupos reducidos que comparten nivel. Sale más económico y se aprende viendo cómo piensan los demás.',
+      },
+      {
+        n: 'Seminarios y charlas',
+        d: 'Sesiones temáticas para clubes, colegios o empresas. Un patrón, una apertura o un final, a fondo.',
+      },
+    ],
+    classCta: 'Consultar disponibilidad',
+
+    liveTitle: 'En directo',
+    liveLead:
+      'Torneos, partidas comentadas y anuncios de clases: todo lo publican en sus perfiles. Síguelos para no perdértelo.',
+    liveFollow: 'Seguir',
+    liveSoon: '¿Tienen canal de Twitch o YouTube? Cuando lo compartan, aparecerá aquí.',
+
+    footerRights: 'Todos los derechos reservados.',
     photoCaption: 'Manuela y José Gabriel, partida improvisada bajo la Torre Eiffel.',
     photoCredit: 'De sus perfiles de Instagram',
     photoQuote: '¿Me aceptas una partida en la Torre Eiffel?',
@@ -76,7 +109,7 @@ const T = {
     tipsTitle: 'Cinco consejos para subir de nivel',
     tipsLead: 'Lo que de verdad mueve la aguja cuando quieres mejorar.',
 
-    piecesCredit: 'Piezas de ajedrez de Cburnett y Rfc1394 (Wikimedia Commons), CC BY-SA 3.0.',
+    piecesCredit: 'Piezas de ajedrez de Cburnett y Rfc1394 (Wikimedia Commons).',
     footerNote:
       'Resultado orientativo y con fines divulgativos: no es un ELO oficial FIDE. Los ejercicios son patrones clásicos elegidos para este proyecto.',
 
@@ -208,6 +241,37 @@ const T = {
     changeLevel: 'Change level',
 
     navHistory: 'History',
+    navClasses: 'Lessons',
+    navLive: 'Live',
+    ctaBook: 'Book a lesson',
+
+    classesTitle: 'Lessons and academy',
+    classesLead:
+      'Manuela teaches chess online in Spanish and English. Format, schedule and price are agreed directly with her.',
+    classesNote: 'No cart, no checkout: you send a message and settle it with the coach. That simple.',
+    classFormats: [
+      {
+        n: 'One-to-one',
+        d: 'Private coaching with a plan built around your own games. The format that raises your level fastest.',
+      },
+      {
+        n: 'Group lessons',
+        d: 'Small groups at a similar level. Cheaper per head, and you learn from how the others think.',
+      },
+      {
+        n: 'Seminars and talks',
+        d: 'Themed sessions for clubs, schools or companies. One pattern, one opening or one endgame, in depth.',
+      },
+    ],
+    classCta: 'Ask about availability',
+
+    liveTitle: 'Live',
+    liveLead:
+      'Tournaments, annotated games and lesson announcements all go up on their profiles. Follow them so you do not miss it.',
+    liveFollow: 'Follow',
+    liveSoon: 'Do they have a Twitch or YouTube channel? Once they share it, it will show up here.',
+
+    footerRights: 'All rights reserved.',
     photoCaption: 'Manuela and José Gabriel, an impromptu game under the Eiffel Tower.',
     photoCredit: 'From their Instagram profiles',
     photoQuote: 'Care for a game at the Eiffel Tower?',
@@ -218,7 +282,7 @@ const T = {
     tipsTitle: 'Five ways to actually improve',
     tipsLead: 'What really moves the needle when you want to get better.',
 
-    piecesCredit: 'Chess pieces by Cburnett and Rfc1394 (Wikimedia Commons), CC BY-SA 3.0.',
+    piecesCredit: 'Chess pieces by Cburnett and Rfc1394 (Wikimedia Commons).',
     footerNote:
       'Indicative result for entertainment: this is not an official FIDE rating. The exercises are classic patterns chosen for this project.',
 
@@ -496,7 +560,12 @@ function Frieze() {
   return (
     <div className="flex justify-center gap-1.5 opacity-80" aria-hidden="true">
       {['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'].map((t, i) => (
-        <Piece key={i} type={t} color={i % 2 ? 'b' : 'w'} className="w-6 h-6 sm:w-8 sm:h-8" />
+        <Piece
+          key={i}
+          type={t}
+          color="w"
+          className={'w-7 h-7 sm:w-9 sm:h-9 ' + (i % 2 ? 'opacity-40' : 'opacity-80')}
+        />
       ))}
     </div>
   );
@@ -808,17 +877,26 @@ function App() {
             <span className="display font-black text-sm tracking-tight">Descubre tu ELO</span>
           </a>
           <div className="flex items-center gap-4">
-            <nav className="hidden sm:flex gap-5 t-label text-ivory/45">
+            <nav className="hidden md:flex gap-5 t-label text-ivory/45">
               <a href="#maestros" className="hover:text-gold transition">
                 {t.mastersTitle}
               </a>
               <a href="#reto" className="hover:text-gold transition">
                 {t.quizTitle}
               </a>
-              <a href="#historia" className="hover:text-gold transition">
-                {t.navHistory}
+              <a href="#clases" className="hover:text-gold transition">
+                {t.navClasses}
+              </a>
+              <a href="#directos" className="hover:text-gold transition">
+                {t.navLive}
               </a>
             </nav>
+            <a
+              href="#clases"
+              className="hidden sm:inline-block bg-gold text-ink t-label px-4 py-2 hover:bg-ivory transition"
+            >
+              {t.ctaBook}
+            </a>
             <div className="inline-flex overflow-hidden ring-1 ring-line text-[11px] font-bold">
               {['es', 'en'].map((l) => (
                 <button
@@ -1172,6 +1250,64 @@ function App() {
           </div>
         </Section>
 
+        {/* ─── CLASES ─── */}
+        <Section id="clases" eyebrow="05" title={t.classesTitle} lead={t.classesLead}>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {t.classFormats.map((f, i) => (
+              <div
+                key={i}
+                className="reveal bg-panel ring-1 ring-line p-5 flex flex-col hover:ring-gold/40 transition"
+              >
+                <h3 className="display text-lg font-black leading-tight">{f.n}</h3>
+                <p className="mt-2 text-sm text-ivory/60 leading-relaxed flex-1">{f.d}</p>
+                <a
+                  href={`https://ig.me/m/${IG_WFM}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 text-center bg-gold/10 ring-1 ring-gold/40 text-gold text-sm font-bold py-2.5 hover:bg-gold hover:text-ink transition"
+                >
+                  {t.classCta} ↗
+                </a>
+              </div>
+            ))}
+          </div>
+          <p className="reveal mt-4 text-xs text-ivory/35 max-w-xl">{t.classesNote}</p>
+        </Section>
+
+        {/* ─── DIRECTOS ─── */}
+        <Section id="directos" eyebrow="06" title={t.liveTitle} lead={t.liveLead}>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {masters.map((m) => (
+              <a
+                key={m.key}
+                href={`https://instagram.com/${m.ig}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="reveal group bg-panel ring-1 ring-line p-5 flex items-center gap-4 hover:ring-gold/40 transition"
+              >
+                {m.foto && (
+                  <img
+                    src={m.foto}
+                    alt=""
+                    width="56"
+                    height="56"
+                    loading="lazy"
+                    className="shrink-0 w-14 h-14 rounded-full object-cover ring-1 ring-gold/40"
+                  />
+                )}
+                <span className="flex-1 min-w-0">
+                  <span className="block font-black leading-tight">{m.name}</span>
+                  <span className="block t-label text-ivory/35 mt-1">@{m.ig}</span>
+                </span>
+                <span className="t-label text-gold shrink-0 group-hover:translate-x-1 transition">
+                  {t.liveFollow} ↗
+                </span>
+              </a>
+            ))}
+          </div>
+          <p className="reveal mt-4 text-xs text-ivory/35 max-w-xl">{t.liveSoon}</p>
+        </Section>
+
         <footer className="mt-16 pt-8 border-t border-line text-center">
           <Frieze />
           <div className="mt-5 flex justify-center gap-4 flex-wrap">
@@ -1187,6 +1323,9 @@ function App() {
               </a>
             ))}
           </div>
+          <p className="mt-6 t-label text-ivory/45">
+            © {ANIO} Descubre tu ELO · {t.footerRights}
+          </p>
           <p className="mt-5 text-[11px] text-ivory/35 max-w-md mx-auto leading-relaxed">{t.footerNote}</p>
           <p className="mt-3 text-[11px] text-ivory/25 max-w-md mx-auto leading-relaxed">
             {t.piecesCredit}{' '}
