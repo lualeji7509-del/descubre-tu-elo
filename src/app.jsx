@@ -68,9 +68,11 @@ const T = {
     changeLevel: 'Cambiar de nivel',
 
     navHistory: 'Historia',
-    showMove: 'Ver la combinación',
+    showMove: 'Ver el patrón',
     hideMove: 'Ocultar',
     spoiler: 'Ojo: enseña la solución.',
+    noEsLaPartida:
+      'Posición de ejemplo, construida para que el patrón se vea claro. No es la partida histórica.',
     navClasses: 'Clases',
     navLive: 'En directo',
     ctaBook: 'Agenda tu clase',
@@ -244,9 +246,10 @@ const T = {
     changeLevel: 'Change level',
 
     navHistory: 'History',
-    showMove: 'See the combination',
+    showMove: 'See the pattern',
     hideMove: 'Hide',
     spoiler: 'Heads up: this shows the solution.',
+    noEsLaPartida: 'Example position, built so the pattern reads clearly. It is not the historical game.',
     navClasses: 'Lessons',
     navLive: 'Live',
     ctaBook: 'Book a lesson',
@@ -1264,6 +1267,9 @@ function App() {
                               {pz.solution.map((m) => sanFor(m, lang)).join('  ')}
                             </p>
                             <p className="mt-1 text-xs text-ivory/45 leading-relaxed">{pz.explain[lang]}</p>
+                            <p className="mt-3 text-[11px] text-ivory/30 leading-relaxed border-l-2 border-line pl-3">
+                              {t.noEsLaPartida}
+                            </p>
                           </div>
                         )}
                       </>

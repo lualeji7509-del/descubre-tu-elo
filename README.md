@@ -97,6 +97,12 @@ Los puzzles no fueron propuestos por Manuela ni por José Gabriel: son
 combinaciones clásicas elegidas para el proyecto. Ellos aparecen como
 protagonistas y como referencia de nivel.
 
+**Sobre la sección de historia:** los datos históricos (autores, fechas,
+orígenes) están documentados, pero **las posiciones no son las partidas
+históricas**: están construidas para que cada patrón se vea claro. La web lo
+dice al desplegar cada tablero. Si algún día se sustituyen por las partidas
+reales, hay que quitar ese aviso.
+
 Dentro de `index.html` van incrustados [React](https://react.dev),
 [Tailwind CSS](https://tailwindcss.com), el motor
 [chess.js](https://github.com/jhlywa/chess.js) y el juego de piezas, así que la
