@@ -81,7 +81,9 @@ const T = {
     classesLead:
       'Manuela imparte clases de ajedrez online en español e inglés. El formato, el horario y el precio se acuerdan directamente con ella.',
     classesNote:
-      'No hay carrito ni pasarela de pago: se habla por mensaje privado y se acuerda con la maestra. Así de simple.',
+      'No hay carrito ni pasarela de pago: se habla por mensaje privado y se acuerda directamente. Así de simple.',
+    askGm: '¿Prefieres preguntarle a José Gabriel?',
+    askGmCta: 'Escríbele',
     classFormats: [
       {
         n: 'Clase individual',
@@ -1312,10 +1314,21 @@ function App() {
                   rel="noopener noreferrer"
                   className="mt-5 text-center bg-gold/10 ring-1 ring-gold/40 text-gold text-sm font-bold py-2.5 hover:bg-gold hover:text-ink transition"
                 >
-                  {t.classCta} ↗
+                  {t.classCta} ↗<span className="block t-label opacity-60 mt-1">Manuela</span>
                 </a>
               </div>
             ))}
+          </div>
+          <div className="reveal mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 bg-panel ring-1 ring-line p-4">
+            <p className="text-sm text-ivory/60">{t.askGm}</p>
+            <a
+              href={`https://ig.me/m/${IG_GM}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="t-label text-gold hover:text-ivory transition"
+            >
+              {t.askGmCta} @{IG_GM} ↗
+            </a>
           </div>
           <p className="reveal mt-4 text-xs text-ivory/35 max-w-xl">{t.classesNote}</p>
         </Section>
