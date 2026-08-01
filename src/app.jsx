@@ -1,9 +1,15 @@
-/* Descubre tu ELO con los Maestros — lógica de la aplicación.
-   Los puzzles NO están aquí: están en puzzles.js (o arriba del todo del index.html).
-   The puzzles are NOT here: they live in puzzles.js (or at the very top of index.html). */
+/* Descubre tu ELO con los Maestros — lógica y secciones de la aplicación.
+   Los puzzles NO están aquí: están en puzzles.js (o arriba del todo del index.html). */
+
+import { PIECE_PATHS, STROKE_ONLY } from './pieces.js';
 
 const { useState, useMemo, useRef, useEffect, useCallback } = React;
 const { Chess } = ChessLib;
+
+/* Perfiles / profiles */
+const IG_WFM = 'wfm_manuchess';
+const IG_GM = 'gmcardosolab';
+const FIDE_WFM = 'https://ratings.fide.com/profile/4483103';
 
 /* ══════════════════════════════ TEXTOS / STRINGS ══════════════════════════ */
 
@@ -12,9 +18,20 @@ const T = {
     eyebrow: 'Reto de ajedrez',
     title1: 'Descubre tu ELO',
     title2: 'con los Maestros',
-    withThe: 'con la',
-    andThe: 'y el',
-    intro: 'Mueve las piezas en el tablero de verdad. Elige con qué maestro quieres medirte.',
+    tagline: 'Nueve posiciones. Un tablero de verdad. Y una cifra al final que te dirá dónde estás.',
+    heroCta: 'Empezar el reto',
+    heroMeta: 'Gratis · 3 minutos · sin registrarte',
+
+    mastersTitle: 'Los maestros',
+    mastersLead: 'Dos formas de medirte. Elige contra quién.',
+    wfmRole: 'Maestra FIDE Femenina',
+    gmRole: 'Gran Maestro Internacional',
+    wfmBio: 'Entrenadora de ajedrez online en español e inglés, y estudiante de Marketing. Compite en torneos por toda Europa.',
+    gmBio: 'Número 1 de Colombia. Estudiante de Marketing en UTRGV, Estados Unidos. Ajedrez y viajes a partes iguales.',
+    seeProfile: 'Ver en Instagram',
+    fideProfile: 'Ficha FIDE',
+
+    quizTitle: 'El reto',
     pickLevel: 'Elige tu nivel',
     wfmName: 'Nivel WFM',
     wfmWho: 'Manuela Hernández · 2020',
@@ -39,35 +56,72 @@ const T = {
     next: 'Siguiente problema',
     seeResult: 'Ver mi ELO',
     tapHint: 'Toca una pieza y luego su destino. También puedes arrastrarla.',
+
     yourElo: 'Tu ELO estimado',
     hits: 'Resueltos',
     firstTry: 'a la primera',
     share: 'Compartir mi resultado en Instagram',
-    shareHint: 'Copiamos el texto con {a} y {b} etiquetados: pégalo en tu historia.',
+    shareHint: 'Copiamos el texto etiquetando a los dos: pégalo en tu historia.',
     copied: '¡Texto copiado! Pégalo en tu historia de Instagram',
     retry: 'Volver a intentarlo',
     changeLevel: 'Cambiar de nivel',
-    disclaimer: 'Resultado orientativo y con fines divulgativos: no es un ELO oficial FIDE.',
+
+    historyTitle: 'Mates con siglos de historia',
+    historyLead: 'Los patrones de este test no se inventaron ayer. Cada uno tiene nombre, fecha y autor.',
+    tipsTitle: 'Cinco consejos para subir de nivel',
+    tipsLead: 'Lo que de verdad mueve la aguja cuando quieres mejorar.',
+
+    footerNote: 'Resultado orientativo y con fines divulgativos: no es un ELO oficial FIDE. Los ejercicios son patrones clásicos elegidos para este proyecto.',
+
     levels: [
-      { max: 1199, t: 'Nivel Principiante', s: '¡A aprender con Manuela!', e: '♟️',
+      { max: 1199, t: 'Nivel Principiante', s: '¡A aprender con Manuela!', p: 'p',
         d: 'Tienes la chispa. Con entrenamiento táctico constante subes rapidísimo.' },
-      { max: 1800, t: 'Nivel Club', s: '¡Cerca del título de WFM!', e: '♞',
+      { max: 1800, t: 'Nivel Club', s: '¡Cerca del título de WFM!', p: 'n',
         d: 'Ves los patrones y calculas bien. Te falta pulir el remate y ya estás en torneo.' },
-      { max: 9999, t: 'Nivel Magistral', s: '¡Mente de GM como José Gabriel!', e: '♛',
+      { max: 9999, t: 'Nivel Magistral', s: '¡Mente de GM como José Gabriel!', p: 'q',
         d: 'Cálculo profundo y visión de sacrificio. Esto no es suerte, es talento.' },
+    ],
+    history: [
+      { era: 'Siglo IX', name: 'Mate árabe',
+        text: 'El más antiguo de todos. Viene del shatranj, el ajedrez persa anterior al que jugamos hoy, y aparece en manuscritos árabes medievales. Entonces la torre y el caballo eran las piezas fuertes: la dama todavía no existía tal y como la conocemos.' },
+      { era: 'Siglo XVIII', name: 'Legado de Philidor',
+        text: 'François-André Danican Philidor (1726–1795) fue el mejor jugador de su tiempo y además compositor de ópera. Este mate ahogado lleva su nombre desde entonces y sigue apareciendo en partidas de hoy.' },
+      { era: '1803', name: 'Mate de Anastasia',
+        text: 'Toma el nombre del libro «Anastasia y el juego de ajedrez», de Wilhelm Heinse: una novela escrita como una serie de cartas en las que se intercalaban posiciones. Un mate bautizado por una obra literaria.' },
+      { era: '1853', name: 'Mate de Boden',
+        text: 'Lleva el nombre de Samuel Boden, que lo ejecutó en Londres en 1853. Ya se había visto antes, en Hamburgo en 1844, pero fue su partida la que lo hizo famoso: dos alfiles cruzándose sobre el rey.' },
+    ],
+    tips: [
+      { n: 'Táctica antes que aperturas', d: 'Por debajo de 1800, casi todas las partidas se deciden por una jugada táctica que alguien no vio. Memorizar quince movimientos de apertura no te salva de un tenedor en la jugada diez.' },
+      { n: 'Aprende patrones, no jugadas', d: 'Los mates de esta página tienen nombre por algo: se repiten. Cuando reconoces la forma dejas de calcular y empiezas a verla. Ese es el salto de verdad.' },
+      { n: 'Revisa tus derrotas', d: 'Duele, pero es donde está la información. Una partida perdida y bien analizada enseña más que diez ganadas sin mirar.' },
+      { n: 'Juega lento de vez en cuando', d: 'El ajedrez rápido entretiene, pero no enseña a calcular. Una partida larga a la semana vale más que cien de un minuto.' },
+      { n: 'Termina lo que empiezas', d: 'Muchos saben atacar y muy pocos rematar. Estudiar finales es lo más aburrido y lo que más puntos da.' },
     ],
     shareText: (elo, lvl, ok, total) =>
       `♟️ Descubre tu ELO con los Maestros ♟️\n\nMi resultado: ${lvl.t} — ${elo} ELO\n${lvl.s}\n` +
       `Resolví ${ok} de ${total} problemas de ajedrez.\n\n¿Te atreves a superarme?\n\n` +
-      `WFM Manuela Hernández ${IG_WFM}\nGM José Gabriel Cardoso ${IG_GM}\n\n#Ajedrez #Chess #ELO #DescubreTuELO`,
+      `WFM Manuela Hernández @${IG_WFM}\nGM José Gabriel Cardoso @${IG_GM}\n\n#Ajedrez #Chess #ELO #DescubreTuELO`,
   },
+
   en: {
     eyebrow: 'Chess challenge',
     title1: 'Find your ELO',
     title2: 'with the Masters',
-    withThe: 'with',
-    andThe: 'and',
-    intro: 'Move the pieces on a real board. Pick the master you want to measure up against.',
+    tagline: 'Nine positions. A real board. And a number at the end that tells you where you stand.',
+    heroCta: 'Start the challenge',
+    heroMeta: 'Free · 3 minutes · no sign-up',
+
+    mastersTitle: 'The masters',
+    mastersLead: 'Two ways to measure up. Pick your opponent.',
+    wfmRole: 'Woman FIDE Master',
+    gmRole: 'International Grandmaster',
+    wfmBio: 'Online chess coach in Spanish and English, and a Marketing student. Competes in tournaments across Europe.',
+    gmBio: "Colombia's number one. Marketing student at UTRGV in the United States. Chess and travel in equal measure.",
+    seeProfile: 'View on Instagram',
+    fideProfile: 'FIDE profile',
+
+    quizTitle: 'The challenge',
     pickLevel: 'Choose your level',
     wfmName: 'WFM Level',
     wfmWho: 'Manuela Hernández · 2020',
@@ -92,46 +146,64 @@ const T = {
     next: 'Next puzzle',
     seeResult: 'See my ELO',
     tapHint: 'Tap a piece, then its destination. You can also drag it.',
+
     yourElo: 'Your estimated ELO',
     hits: 'Solved',
     firstTry: 'first try',
     share: 'Share my result on Instagram',
-    shareHint: 'We copy the text tagging {a} and {b}: paste it into your story.',
+    shareHint: 'We copy the text tagging them both: paste it into your story.',
     copied: 'Text copied! Paste it into your Instagram story',
     retry: 'Try again',
     changeLevel: 'Change level',
-    disclaimer: 'Indicative result for entertainment: this is not an official FIDE rating.',
+
+    historyTitle: 'Checkmates with centuries behind them',
+    historyLead: 'The patterns in this test were not invented yesterday. Each one has a name, a date and an author.',
+    tipsTitle: 'Five ways to actually improve',
+    tipsLead: 'What really moves the needle when you want to get better.',
+
+    footerNote: 'Indicative result for entertainment: this is not an official FIDE rating. The exercises are classic patterns chosen for this project.',
+
     levels: [
-      { max: 1199, t: 'Beginner Level', s: 'Time to learn with Manuela!', e: '♟️',
+      { max: 1199, t: 'Beginner Level', s: 'Time to learn with Manuela!', p: 'p',
         d: 'The spark is there. With steady tactical training you will climb fast.' },
-      { max: 1800, t: 'Club Level', s: 'Closing in on the WFM title!', e: '♞',
+      { max: 1800, t: 'Club Level', s: 'Closing in on the WFM title!', p: 'n',
         d: 'You see the patterns and calculate well. Sharpen the finish and you are tournament ready.' },
-      { max: 9999, t: 'Master Level', s: 'A GM mind, like José Gabriel!', e: '♛',
+      { max: 9999, t: 'Master Level', s: 'A GM mind, like José Gabriel!', p: 'q',
         d: 'Deep calculation and an eye for sacrifice. That is not luck, that is talent.' },
+    ],
+    history: [
+      { era: '9th century', name: 'Arabian mate',
+        text: 'The oldest of them all. It comes from shatranj, the Persian chess played long before the modern game, and appears in medieval Arabic manuscripts. Back then rook and knight were the strong pieces: the queen as we know her did not exist yet.' },
+      { era: '18th century', name: "Philidor's legacy",
+        text: 'François-André Danican Philidor (1726–1795) was the best player of his time and an opera composer besides. This smothered mate has carried his name ever since, and it still turns up in games today.' },
+      { era: '1803', name: "Anastasia's mate",
+        text: 'Named after the book "Anastasia and the Game of Chess" by Wilhelm Heinse: a novel written as a series of letters with chess positions woven through it. A checkmate christened by a work of literature.' },
+      { era: '1853', name: "Boden's mate",
+        text: 'Named for Samuel Boden, who played it in London in 1853. It had been seen before, in Hamburg in 1844, but his game is the one that made it famous: two bishops criss-crossing over the king.' },
+    ],
+    tips: [
+      { n: 'Tactics before openings', d: 'Below 1800, almost every game is decided by one tactical move somebody missed. Memorising fifteen moves of an opening will not save you from a fork on move ten.' },
+      { n: 'Learn patterns, not moves', d: 'The mates on this page have names for a reason: they repeat. Once you recognise the shape you stop calculating and start seeing it. That is the real jump.' },
+      { n: 'Review your losses', d: 'It stings, but that is where the information is. One lost game properly analysed teaches more than ten wins you never looked at.' },
+      { n: 'Play slow sometimes', d: 'Fast chess is fun but it does not teach you to calculate. One long game a week beats a hundred bullet games.' },
+      { n: 'Finish what you start', d: 'Plenty of players can attack; very few can convert. Endgames are the dullest thing to study and the biggest source of points.' },
     ],
     shareText: (elo, lvl, ok, total) =>
       `♟️ Find your ELO with the Masters ♟️\n\nMy result: ${lvl.t} — ${elo} ELO\n${lvl.s}\n` +
       `I solved ${ok} of ${total} chess puzzles.\n\nThink you can beat me?\n\n` +
-      `WFM Manuela Hernández ${IG_WFM}\nGM José Gabriel Cardoso ${IG_GM}\n\n#Chess #Ajedrez #ELO #FindYourELO`,
+      `WFM Manuela Hernández @${IG_WFM}\nGM José Gabriel Cardoso @${IG_GM}\n\n#Chess #Ajedrez #ELO #FindYourELO`,
   },
 };
 
-/* Perfiles de Instagram / Instagram handles */
-const IG_WFM = '@wfm_manuchess';
-const IG_GM = '@gmcardosolab';
-
 /* ═══════════════════════════ AJEDREZ / CHESS HELPERS ══════════════════════ */
 
-const GLYPHS = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
-/* Traduce la notación inglesa (Nf3) a la española (Cf3). Una sola pasada,
-   para que la K del rey no se convierta después en T de torre. */
+/* Notación inglesa (Nf3) → española (Cf3). Una sola pasada, para que la K del
+   rey no acabe convertida en la T de torre. */
 const SAN_ES = { K: 'R', Q: 'D', R: 'T', B: 'A', N: 'C' };
-function sanFor(san, lang) {
-  if (lang !== 'es') return san;
-  return san.split('').map((ch) => SAN_ES[ch] || ch).join('');
-}
+const sanFor = (san, lang) =>
+  lang === 'es' ? san.split('').map((c) => SAN_ES[c] || c).join('') : san;
 
 function shuffle(arr) {
   const a = arr.slice();
@@ -142,24 +214,37 @@ function shuffle(arr) {
   return a;
 }
 
-/* ═════════════════════════════════ TABLERO ════════════════════════════════ */
+/* ════════════════════════════════ PIEZA ═══════════════════════════════════ */
+
+function Piece({ type, color, className = 'w-[88%] h-[88%]' }) {
+  const paths = PIECE_PATHS[type] || [];
+  const outline = STROKE_ONLY[type] || [];
+  const fill = color === 'w' ? '#f6f2e8' : '#16222e';
+  const line = color === 'w' ? '#0d1620' : '#b9c8d8';
+  return (
+    <svg viewBox="0 0 45 45" className={'pointer-events-none ' + className} aria-hidden="true">
+      <g stroke={line} strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round">
+        {paths.map((d, i) => (
+          <path key={i} d={d} fill={outline.includes(i) ? 'none' : fill} />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+/* ════════════════════════════════ TABLERO ═════════════════════════════════ */
 
 function Board({ game, orientation, selected, targets, lastMove, flash, onSquare, disabled }) {
   const ranks = orientation === 'w' ? [8, 7, 6, 5, 4, 3, 2, 1] : [1, 2, 3, 4, 5, 6, 7, 8];
   const files = orientation === 'w' ? FILES : FILES.slice().reverse();
   const board = game.board();
-
-  const pieceAt = (sq) => {
-    const f = FILES.indexOf(sq[0]);
-    const r = 8 - Number(sq[1]);
-    return board[r][f];
-  };
+  const pieceAt = (sq) => board[8 - Number(sq[1])][FILES.indexOf(sq[0])];
 
   return (
     <div
       className={
-        'grid grid-cols-8 w-full max-w-[380px] mx-auto rounded-lg overflow-hidden ring-4 shadow-2xl transition-all duration-200 ' +
-        (flash === 'ok' ? 'ring-emerald-400' : flash === 'bad' ? 'ring-rose-500 animate-shake' : 'ring-black/40')
+        'grid grid-cols-8 w-full max-w-[400px] mx-auto rounded-xl overflow-hidden ring-4 shadow-2xl transition-all duration-200 ' +
+        (flash === 'ok' ? 'ring-emerald-400' : flash === 'bad' ? 'ring-rose-500 animate-shake' : 'ring-black/50')
       }
     >
       {ranks.map((rank) =>
@@ -167,9 +252,7 @@ function Board({ game, orientation, selected, targets, lastMove, flash, onSquare
           const sq = file + rank;
           const dark = (FILES.indexOf(file) + rank) % 2 === 0;
           const piece = pieceAt(sq);
-          const isSel = selected === sq;
           const isTarget = targets.includes(sq);
-          const isLast = lastMove && (lastMove[0] === sq || lastMove[1] === sq);
           return (
             <button
               key={sq}
@@ -183,37 +266,26 @@ function Board({ game, orientation, selected, targets, lastMove, flash, onSquare
                 (dark ? 'bg-board-dark' : 'bg-board-light')
               }
             >
-              {isLast && <span className="absolute inset-0 bg-gold/30"></span>}
-              {isSel && <span className="absolute inset-0 bg-gold/55 ring-2 ring-inset ring-gold"></span>}
-              {piece && (
-                <span
-                  className={
-                    'piece relative text-[7.4vw] sm:text-[2.6rem] ' +
-                    (piece.color === 'w' ? 'piece-w' : 'piece-b')
-                  }
-                >
-                  {GLYPHS[piece.type]}
-                </span>
+              {lastMove && (lastMove[0] === sq || lastMove[1] === sq) && (
+                <span className="absolute inset-0 bg-gold/35"></span>
               )}
+              {selected === sq && <span className="absolute inset-0 bg-gold/60 ring-2 ring-inset ring-gold"></span>}
+              {piece && <Piece type={piece.type} color={piece.color} />}
               {isTarget && (
                 <span
                   className={
                     'absolute pointer-events-none ' +
                     (piece
-                      ? 'inset-0 ring-[5px] ring-inset ring-emerald-400/80 rounded-sm'
-                      : 'w-1/3 h-1/3 rounded-full bg-emerald-400/70')
+                      ? 'inset-0 ring-[5px] ring-inset ring-emerald-400/90 rounded-sm'
+                      : 'w-1/3 h-1/3 rounded-full bg-emerald-400/80')
                   }
                 ></span>
               )}
               {file === files[0] && (
-                <span className={'absolute left-0.5 top-0 text-[9px] font-bold ' + (dark ? 'text-board-light/70' : 'text-board-dark/70')}>
-                  {rank}
-                </span>
+                <span className={'absolute left-0.5 top-0 text-[9px] font-bold ' + (dark ? 'text-board-light/70' : 'text-board-dark/70')}>{rank}</span>
               )}
               {rank === ranks[7] && (
-                <span className={'absolute right-0.5 bottom-0 text-[9px] font-bold ' + (dark ? 'text-board-light/70' : 'text-board-dark/70')}>
-                  {file}
-                </span>
+                <span className={'absolute right-0.5 bottom-0 text-[9px] font-bold ' + (dark ? 'text-board-light/70' : 'text-board-dark/70')}>{file}</span>
               )}
             </button>
           );
@@ -223,14 +295,39 @@ function Board({ game, orientation, selected, targets, lastMove, flash, onSquare
   );
 }
 
+/* ═════════════════════════ ADORNOS Y ESTRUCTURA ══════════════════════════ */
+
+function Frieze() {
+  return (
+    <div className="flex justify-center gap-1 opacity-90" aria-hidden="true">
+      {['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'].map((t, i) => (
+        <Piece key={i} type={t} color={i % 2 ? 'b' : 'w'} className="w-7 h-7 sm:w-9 sm:h-9" />
+      ))}
+    </div>
+  );
+}
+
+function Section({ id, eyebrow, title, lead, innerRef, children }) {
+  return (
+    <section id={id} ref={innerRef} className="mt-16 sm:mt-24 scroll-mt-16">
+      <div className="text-center">
+        {eyebrow && <p className="text-gold tracking-[0.3em] text-[10px] font-bold uppercase tabular-nums">{eyebrow}</p>}
+        <h2 className="display mt-2 text-2xl sm:text-3xl font-black">{title}</h2>
+        {lead && <p className="mt-2 text-sm text-slate-400 max-w-lg mx-auto">{lead}</p>}
+      </div>
+      <div className="mt-7">{children}</div>
+    </section>
+  );
+}
+
 /* ═══════════════════════════════════ APP ═════════════════════════════════ */
 
 function App() {
   const [lang, setLang] = useState(
     typeof navigator !== 'undefined' && /^en/i.test(navigator.language || '') ? 'en' : 'es'
   );
-  const [screen, setScreen] = useState('home');
   const [level, setLevel] = useState(null);
+  const [stage, setStage] = useState('pick');
   const [queue, setQueue] = useState([]);
   const [idx, setIdx] = useState(0);
   const [results, setResults] = useState([]);
@@ -238,49 +335,39 @@ function App() {
 
   const t = T[lang];
   const all = window.PUZZLES || [];
+  const quizRef = useRef(null);
 
-  /* ── estado del puzzle en curso ── */
   const gameRef = useRef(new Chess());
   const [, forceRender] = useState(0);
   const bump = () => forceRender((n) => n + 1);
 
-  const [step, setStep] = useState(0);          // jugada de la solución que toca
+  const [step, setStep] = useState(0);
   const [selected, setSelected] = useState(null);
   const [mistakes, setMistakes] = useState(0);
-  const [flash, setFlash] = useState(null);     // 'ok' | 'bad'
+  const [flash, setFlash] = useState(null);
   const [lastMove, setLastMove] = useState(null);
-  const [phase, setPhase] = useState('play');   // 'play' | 'busy' | 'solved' | 'shown'
-  const [msg, setMsg] = useState(null);         // {kind, text}
+  const [phase, setPhase] = useState('play');
+  const [msg, setMsg] = useState(null);
 
   const puzzle = queue[idx];
-  const orientation = useMemo(
-    () => (puzzle ? new Chess(puzzle.fen).turn() : 'w'),
-    [puzzle]
-  );
+  const orientation = useMemo(() => (puzzle ? new Chess(puzzle.fen).turn() : 'w'), [puzzle]);
 
   const loadPuzzle = useCallback((p) => {
     gameRef.current = new Chess(p.fen);
-    setStep(0);
-    setSelected(null);
-    setMistakes(0);
-    setFlash(null);
-    setLastMove(null);
-    setPhase('play');
-    setMsg(null);
+    setStep(0); setSelected(null); setMistakes(0);
+    setFlash(null); setLastMove(null); setPhase('play'); setMsg(null);
     bump();
   }, []);
 
+  const toQuiz = () => quizRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
   function start(lv) {
-    const pool = shuffle(all.filter((p) => p.level === lv));
-    setLevel(lv);
-    setQueue(pool);
-    setIdx(0);
-    setResults([]);
-    setScreen('play');
-    loadPuzzle(pool[0]);
+    const list = shuffle(all.filter((p) => p.level === lv));
+    setLevel(lv); setQueue(list); setIdx(0); setResults([]);
+    setStage('play'); loadPuzzle(list[0]);
+    setTimeout(toQuiz, 60);
   }
 
-  /* ── mover ── */
   function attempt(from, to) {
     const g = gameRef.current;
     const expected = puzzle.solution[step];
@@ -288,51 +375,38 @@ function App() {
     let mv = null;
     try {
       mv = test.move({ from, to, promotion: expected.includes('=') ? expected.split('=')[1][0].toLowerCase() : 'q' });
-    } catch (e) {
-      mv = null;
-    }
+    } catch (e) { mv = null; }
 
     if (!mv) {
       setMsg({ kind: 'bad', text: t.illegal });
-      setFlash('bad');
-      setTimeout(() => setFlash(null), 400);
+      setFlash('bad'); setTimeout(() => setFlash(null), 400);
       return;
     }
-
     if (mv.san !== expected) {
       setMistakes((m) => m + 1);
       setMsg({ kind: 'bad', text: t.wrong });
-      setFlash('bad');
-      setSelected(null);
+      setFlash('bad'); setSelected(null);
       setTimeout(() => setFlash(null), 400);
       return;
     }
 
-    /* acierto */
     g.move(expected);
-    setLastMove([mv.from, mv.to]);
-    setSelected(null);
-    setFlash('ok');
-    setTimeout(() => setFlash(null), 450);
+    setLastMove([mv.from, mv.to]); setSelected(null);
+    setFlash('ok'); setTimeout(() => setFlash(null), 450);
     bump();
 
     const next = step + 1;
     if (next >= puzzle.solution.length) return finish(true);
 
-    /* responde el rival */
     setPhase('busy');
     setMsg({ kind: 'ok', text: t.keepGoing });
     setStep(next);
     setTimeout(() => {
-      const reply = puzzle.solution[next];
-      const r = g.move(reply);
-      setLastMove([r.from, r.to]);
-      bump();
+      const r = g.move(puzzle.solution[next]);
+      setLastMove([r.from, r.to]); bump();
       const after = next + 1;
       if (after >= puzzle.solution.length) return finish(true);
-      setStep(after);
-      setPhase('play');
-      setMsg(null);
+      setStep(after); setPhase('play'); setMsg(null);
     }, 650);
   }
 
@@ -346,12 +420,9 @@ function App() {
     const g = new Chess(puzzle.fen);
     puzzle.solution.forEach((san) => g.move(san));
     gameRef.current = g;
-    const lastSan = puzzle.solution[puzzle.solution.length - 1];
     const hist = g.history({ verbose: true });
-    const lastVerbose = hist[hist.length - 1];
-    setLastMove([lastVerbose.from, lastVerbose.to]);
-    setSelected(null);
-    bump();
+    const last = hist[hist.length - 1];
+    setLastMove([last.from, last.to]); setSelected(null); bump();
     finish(false);
   }
 
@@ -359,35 +430,31 @@ function App() {
     if (phase !== 'play') return;
     const g = gameRef.current;
     const piece = g.get(sq);
-
     if (selected && selected !== sq) {
       const legal = g.moves({ square: selected, verbose: true }).some((m) => m.to === sq);
       if (legal) return attempt(selected, sq);
     }
     if (piece && piece.color === g.turn()) {
-      setSelected(sq === selected ? null : sq);
-      setMsg(null);
-      return;
+      setSelected(sq === selected ? null : sq); setMsg(null); return;
     }
     setSelected(null);
   }
 
   function next() {
     const n = idx + 1;
-    if (n >= queue.length) return setScreen('result');
-    setIdx(n);
-    loadPuzzle(queue[n]);
+    if (n >= queue.length) { setStage('result'); setTimeout(toQuiz, 60); return; }
+    setIdx(n); loadPuzzle(queue[n]);
   }
 
-  /* ── arrastre con el dedo o el ratón ── */
+  /* arrastre / drag */
   const boardWrap = useRef(null);
   useEffect(() => {
     const el = boardWrap.current;
     if (!el) return;
     let from = null;
     const squareAt = (x, y) => {
-      const target = document.elementFromPoint(x, y);
-      const btn = target && target.closest('[data-square]');
+      const hit = document.elementFromPoint(x, y);
+      const btn = hit && hit.closest('[data-square]');
       return btn ? btn.dataset.square : null;
     };
     const down = (e) => {
@@ -399,30 +466,24 @@ function App() {
     const up = (e) => {
       if (!from || phase !== 'play') return;
       const sq = squareAt(e.clientX, e.clientY);
-      if (sq && sq !== from) {
-        const legal = gameRef.current.moves({ square: from, verbose: true }).some((m) => m.to === sq);
-        if (legal) attempt(from, sq);
+      if (sq && sq !== from && gameRef.current.moves({ square: from, verbose: true }).some((m) => m.to === sq)) {
+        attempt(from, sq);
       }
       from = null;
     };
     el.addEventListener('pointerdown', down);
     window.addEventListener('pointerup', up);
-    return () => {
-      el.removeEventListener('pointerdown', down);
-      window.removeEventListener('pointerup', up);
-    };
+    return () => { el.removeEventListener('pointerdown', down); window.removeEventListener('pointerup', up); };
   });
 
-  /* ── ELO estimado ── */
   const elo = useMemo(() => {
     if (!results.length) return 0;
-    const pts = results.map((r) => {
-      if (!r.solved) return r.rating - 350;
-      if (r.mistakes === 0) return r.rating + 100;
-      return Math.max(r.rating - 200, r.rating - 60 * r.mistakes);
-    });
-    const avg = pts.reduce((a, b) => a + b, 0) / pts.length;
-    return Math.max(600, Math.min(2800, Math.round(avg / 10) * 10));
+    const pts = results.map((r) =>
+      !r.solved ? r.rating - 350
+        : r.mistakes === 0 ? r.rating + 100
+        : Math.max(r.rating - 200, r.rating - 60 * r.mistakes)
+    );
+    return Math.max(600, Math.min(2800, Math.round(pts.reduce((a, b) => a + b, 0) / pts.length / 10) * 10));
   }, [results]);
 
   const nivel = useMemo(() => t.levels.find((l) => elo <= l.max) || t.levels[2], [elo, lang]);
@@ -433,200 +494,260 @@ function App() {
 
   async function share() {
     const txt = t.shareText(elo, nivel, solvedCount, results.length);
-    try {
-      await navigator.clipboard.writeText(txt);
-    } catch (e) {
+    try { await navigator.clipboard.writeText(txt); }
+    catch (e) {
       const ta = document.createElement('textarea');
-      ta.value = txt;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
+      ta.value = txt; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove();
     }
     showToast(t.copied);
   }
 
-  const counts = (lv) => all.filter((p) => p.level === lv);
+  const pool = (lv) => all.filter((p) => p.level === lv);
   const range = (lv) => {
-    const rs = counts(lv).map((p) => p.rating);
+    const rs = pool(lv).map((p) => p.rating);
     return rs.length ? `${Math.min(...rs)}–${Math.max(...rs)}` : '—';
   };
+
+  const masters = [
+    { key: 'wfm', title: 'WFM', name: 'Manuela Hernández', role: t.wfmRole, elo: 2020,
+      bio: t.wfmBio, ig: IG_WFM, fide: FIDE_WFM, piece: 'n', accent: 'text-emerald-300' },
+    { key: 'gm', title: 'GM', name: 'José Gabriel Cardoso', role: t.gmRole, elo: 2518,
+      bio: t.gmBio, ig: IG_GM, fide: null, piece: 'q', accent: 'text-amber-300' },
+  ];
 
   /* ══════════════════════════════ RENDER ══════════════════════════════ */
 
   return (
-    <div className="min-h-screen px-4 py-7 flex flex-col items-center">
-      <div className="w-full max-w-xl">
-
-        {/* selector de idioma */}
-        <div className="flex justify-end mb-3">
+    <div className="min-h-screen">
+      <div className="sticky top-0 z-30 backdrop-blur bg-ink/70 border-b border-white/10">
+        <div className="max-w-3xl mx-auto px-4 py-2.5 flex items-center justify-between">
+          <span className="flex items-center gap-2">
+            <Piece type="n" color="w" className="w-6 h-6" />
+            <span className="display font-black text-sm">Descubre tu ELO</span>
+          </span>
           <div className="inline-flex rounded-lg overflow-hidden ring-1 ring-white/15 text-xs font-bold">
             {['es', 'en'].map((l) => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                aria-pressed={lang === l}
-                className={'px-3 py-1.5 transition ' + (lang === l ? 'bg-gold text-ink' : 'bg-white/5 text-slate-300')}
-              >
+              <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l}
+                      className={'px-3 py-1.5 transition ' + (lang === l ? 'bg-gold text-ink' : 'bg-white/5 text-slate-300')}>
                 {l.toUpperCase()}
               </button>
             ))}
           </div>
         </div>
+      </div>
 
-        <header className="text-center mb-6">
-          <p className="text-gold tracking-[0.35em] text-[11px] font-semibold uppercase">♔ {t.eyebrow} ♚</p>
-          <h1 className="display mt-2 text-3xl sm:text-4xl font-black leading-tight bg-gradient-to-r from-gold via-amber-200 to-gold bg-clip-text text-transparent">
+      <main className="max-w-3xl mx-auto px-4 pb-20">
+
+        <header className="pt-12 pb-2 text-center">
+          <p className="text-gold tracking-[0.35em] text-[11px] font-bold uppercase">{t.eyebrow}</p>
+          <h1 className="display mt-3 text-4xl sm:text-6xl font-black leading-[1.05] bg-gradient-to-r from-gold via-amber-100 to-gold bg-clip-text text-transparent">
             {t.title1}<br />{t.title2}
           </h1>
-          <p className="mt-3 text-sm text-slate-300">
-            {t.withThe} <strong className="text-white">WFM Manuela Hernández</strong> {t.andThe}{' '}
-            <strong className="text-white">GM José Gabriel Cardoso</strong>
-          </p>
+          <p className="mt-5 text-slate-300 max-w-md mx-auto leading-relaxed">{t.tagline}</p>
+          <button onClick={toQuiz}
+                  className="mt-7 bg-gradient-to-r from-gold to-amber-300 text-ink font-black text-lg px-8 py-4 rounded-xl active:scale-[.98] transition shadow-lg shadow-gold/20">
+            {t.heroCta}
+          </button>
+          <p className="mt-3 text-xs text-slate-500">{t.heroMeta}</p>
+          <div className="mt-9"><Frieze /></div>
         </header>
 
-        {/* ───────────── PORTADA ───────────── */}
-        {screen === 'home' && (
-          <div className="bg-panel/80 backdrop-blur rounded-2xl p-6 ring-1 ring-white/10 shadow-xl">
-            <p className="text-center text-slate-200 leading-relaxed">{t.intro}</p>
-            <p className="mt-6 text-center text-[11px] uppercase tracking-[0.25em] text-slate-400">{t.pickLevel}</p>
+        {/* ─── LOS MAESTROS ─── */}
+        <Section id="maestros" eyebrow="01" title={t.mastersTitle} lead={t.mastersLead}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {masters.map((m) => (
+              <article key={m.key} className="bg-panel/70 ring-1 ring-white/10 rounded-2xl p-5 flex flex-col">
+                <div className="flex items-center gap-3">
+                  <span className="shrink-0 w-14 h-14 rounded-full bg-black/40 ring-1 ring-white/10 flex items-center justify-center">
+                    <Piece type={m.piece} color="w" className="w-9 h-9" />
+                  </span>
+                  <div>
+                    <p className={'text-[11px] font-black tracking-widest uppercase ' + m.accent}>{m.title} · {m.role}</p>
+                    <h3 className="display text-xl font-black leading-tight">{m.name}</h3>
+                  </div>
+                </div>
+                <p className="mt-3 display text-4xl font-black tabular-nums text-gold leading-none">{m.elo}</p>
+                <p className="mt-1 text-[11px] uppercase tracking-widest text-slate-500">ELO</p>
+                <p className="mt-3 text-sm text-slate-300 leading-relaxed flex-1">{m.bio}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <a href={`https://instagram.com/${m.ig}`} target="_blank" rel="noopener noreferrer"
+                     className="flex-1 text-center bg-gradient-to-r from-fuchsia-600 via-rose-500 to-amber-400 text-white text-sm font-bold py-2.5 rounded-lg active:scale-[.98] transition">
+                    {t.seeProfile}
+                  </a>
+                  {m.fide && (
+                    <a href={m.fide} target="_blank" rel="noopener noreferrer"
+                       className="text-center bg-white/5 ring-1 ring-white/10 text-slate-300 text-sm font-bold px-4 py-2.5 rounded-lg active:scale-[.98] transition">
+                      {t.fideProfile}
+                    </a>
+                  )}
+                </div>
+                <p className="mt-2 text-center text-xs text-slate-500">@{m.ig}</p>
+              </article>
+            ))}
+          </div>
+        </Section>
 
-            <div className="mt-4 grid gap-3">
+        {/* ─── EL RETO ─── */}
+        <Section id="reto" innerRef={quizRef} eyebrow="02" title={t.quizTitle}
+                 lead={stage === 'pick' ? t.tapHint : null}>
+
+          {stage === 'pick' && (
+            <div className="grid gap-3">
+              <p className="text-center text-[11px] uppercase tracking-[0.25em] text-slate-400">{t.pickLevel}</p>
               {[
-                { key: 'wfm', name: t.wfmName, who: t.wfmWho, desc: t.wfmDesc, glyph: '♞', accent: 'from-emerald-400 to-lime-300' },
-                { key: 'gm', name: t.gmName, who: t.gmWho, desc: t.gmDesc, glyph: '♛', accent: 'from-amber-300 to-yellow-200' },
+                { key: 'wfm', name: t.wfmName, who: t.wfmWho, desc: t.wfmDesc, piece: 'n' },
+                { key: 'gm', name: t.gmName, who: t.gmWho, desc: t.gmDesc, piece: 'q' },
               ].map((lv) => (
-                <button
-                  key={lv.key}
-                  onClick={() => start(lv.key)}
-                  className="group text-left bg-black/30 hover:bg-black/45 ring-1 ring-white/10 hover:ring-gold/60 rounded-xl p-4 transition active:scale-[.99]"
-                >
+                <button key={lv.key} onClick={() => start(lv.key)}
+                        className="text-left bg-panel/70 hover:bg-panel ring-1 ring-white/10 hover:ring-gold/60 rounded-xl p-4 transition active:scale-[.99]">
                   <div className="flex items-start gap-4">
-                    <span className={'text-4xl bg-gradient-to-br ' + lv.accent + ' bg-clip-text text-transparent'}>{lv.glyph}</span>
+                    <Piece type={lv.piece} color="w" className="w-11 h-11 shrink-0" />
                     <div className="flex-1">
                       <p className="font-black text-lg leading-tight">{lv.name}</p>
                       <p className="text-gold text-sm font-bold">{lv.who}</p>
                       <p className="mt-1 text-sm text-slate-300">{lv.desc}</p>
                       <p className="mt-2 text-xs text-slate-400 tabular-nums">
-                        {counts(lv.key).length} {t.puzzles} · {t.ratingRange} {range(lv.key)}
+                        {pool(lv.key).length} {t.puzzles} · {t.ratingRange} {range(lv.key)}
                       </p>
                     </div>
                   </div>
                 </button>
               ))}
             </div>
-            <p className="mt-5 text-center text-xs text-slate-400">{t.tapHint}</p>
-          </div>
-        )}
+          )}
 
-        {/* ───────────── JUEGO ───────────── */}
-        {screen === 'play' && puzzle && (
-          <div className="bg-panel/80 backdrop-blur rounded-2xl p-5 ring-1 ring-white/10 shadow-xl">
-            <div className="flex items-center justify-between text-xs text-slate-400 mb-2 tabular-nums">
-              <span>{t.problem} {idx + 1} {t.of} {queue.length}</span>
-              <span className="text-gold font-bold">{level === 'wfm' ? t.wfmName : t.gmName} · {puzzle.rating}</span>
-            </div>
-            <div className="h-1.5 bg-black/40 rounded-full overflow-hidden mb-4">
-              <div className="h-full bg-gradient-to-r from-gold to-amber-200 transition-all duration-500"
-                   style={{ width: `${(idx / queue.length) * 100}%` }} />
-            </div>
+          {stage === 'play' && puzzle && (
+            <div className="bg-panel/70 rounded-2xl p-5 ring-1 ring-white/10 shadow-xl">
+              <div className="flex items-center justify-between text-xs text-slate-400 mb-2 tabular-nums">
+                <span>{t.problem} {idx + 1} {t.of} {queue.length}</span>
+                <span className="text-gold font-bold">{level === 'wfm' ? t.wfmName : t.gmName} · {puzzle.rating}</span>
+              </div>
+              <div className="h-1.5 bg-black/40 rounded-full overflow-hidden mb-4">
+                <div className="h-full bg-gradient-to-r from-gold to-amber-200 transition-all duration-500"
+                     style={{ width: `${(idx / queue.length) * 100}%` }} />
+              </div>
 
-            {/* El tema se revela al terminar: enseñarlo antes sería darle la pista. */}
-            <div className="flex items-center gap-2 flex-wrap mb-3">
-              <span className="text-[11px] uppercase tracking-wider bg-white/10 text-slate-300 px-2 py-1 rounded">
-                {orientation === 'w' ? t.whiteToPlay : t.blackToPlay}
-              </span>
-              {(phase === 'solved' || phase === 'shown') && (
-                <span className="text-[11px] uppercase tracking-wider bg-gold/15 text-gold px-2 py-1 rounded">
-                  {puzzle.theme[lang]}
+              {/* El tema se revela al terminar: enseñarlo antes sería dar la pista. */}
+              <div className="flex items-center gap-2 flex-wrap mb-3">
+                <span className="text-[11px] uppercase tracking-wider bg-white/10 text-slate-300 px-2 py-1 rounded">
+                  {orientation === 'w' ? t.whiteToPlay : t.blackToPlay}
                 </span>
-              )}
-            </div>
+                {(phase === 'solved' || phase === 'shown') && (
+                  <span className="text-[11px] uppercase tracking-wider bg-gold/15 text-gold px-2 py-1 rounded">
+                    {puzzle.theme[lang]}
+                  </span>
+                )}
+              </div>
 
-            <div ref={boardWrap}>
-              <Board
-                game={gameRef.current}
-                orientation={orientation}
-                selected={selected}
-                targets={selected ? gameRef.current.moves({ square: selected, verbose: true }).map((m) => m.to) : []}
-                lastMove={lastMove}
-                flash={flash}
-                onSquare={onSquare}
-                disabled={phase !== 'play'}
-              />
-            </div>
+              <div ref={boardWrap}>
+                <Board game={gameRef.current} orientation={orientation} selected={selected}
+                       targets={selected ? gameRef.current.moves({ square: selected, verbose: true }).map((m) => m.to) : []}
+                       lastMove={lastMove} flash={flash} onSquare={onSquare} disabled={phase !== 'play'} />
+              </div>
 
-            <div className="mt-4 min-h-[3.5rem]">
-              {!msg && phase === 'play' && <p className="text-sm text-slate-300">{t.yourTurn}</p>}
-              {msg && (
-                <p className={'font-bold ' + (msg.kind === 'ok' ? 'text-emerald-300' : 'text-rose-300')}>{msg.text}</p>
+              <div className="mt-4 min-h-[3.5rem]">
+                {!msg && phase === 'play' && <p className="text-sm text-slate-300">{t.yourTurn}</p>}
+                {msg && <p className={'font-bold ' + (msg.kind === 'ok' ? 'text-emerald-300' : 'text-rose-300')}>{msg.text}</p>}
+                {(phase === 'solved' || phase === 'shown') && (
+                  <>
+                    <p className="mt-1 text-sm text-slate-300 leading-relaxed">{puzzle.explain[lang]}</p>
+                    <p className="mt-2 text-sm text-gold font-bold tabular-nums">
+                      {puzzle.solution.map((s) => sanFor(s, lang)).join('  ')}
+                    </p>
+                  </>
+                )}
+              </div>
+
+              {phase === 'play' && mistakes >= 2 && (
+                <button onClick={reveal}
+                        className="mt-2 w-full bg-white/5 ring-1 ring-white/10 text-slate-300 text-sm font-bold py-2.5 rounded-lg active:scale-[.99] transition">
+                  {t.showSolution}
+                </button>
               )}
               {(phase === 'solved' || phase === 'shown') && (
-                <>
-                  <p className="mt-1 text-sm text-slate-300 leading-relaxed">{puzzle.explain[lang]}</p>
-                  <p className="mt-2 text-sm text-gold font-bold tabular-nums">
-                    {puzzle.solution.map((s) => sanFor(s, lang)).join('  ')}
-                  </p>
-                </>
+                <button onClick={next}
+                        className="mt-3 w-full bg-gradient-to-r from-gold to-amber-300 text-ink font-black py-3.5 rounded-xl active:scale-[.98] transition">
+                  {idx === queue.length - 1 ? t.seeResult : t.next}
+                </button>
               )}
             </div>
+          )}
 
-            {phase === 'play' && mistakes >= 2 && (
-              <button onClick={reveal}
-                      className="mt-2 w-full bg-white/5 ring-1 ring-white/10 text-slate-300 text-sm font-bold py-2.5 rounded-lg active:scale-[.99] transition">
-                {t.showSolution}
+          {stage === 'result' && (
+            <div className="bg-panel/70 rounded-2xl p-6 ring-1 ring-white/10 shadow-xl text-center">
+              <div className="flex justify-center mb-1"><Piece type={nivel.p} color="w" className="w-16 h-16" /></div>
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{t.yourElo}</p>
+              <p className="display text-6xl font-black text-gold tabular-nums">{elo}</p>
+              <h3 className="display mt-3 text-2xl font-black">{nivel.t}</h3>
+              <p className="text-gold font-bold">{nivel.s}</p>
+              <p className="mt-3 text-sm text-slate-300">{nivel.d}</p>
+              <p className="mt-4 text-sm text-slate-400 tabular-nums">
+                {t.hits}: <strong className="text-white">{solvedCount} / {results.length}</strong>
+                {cleanCount > 0 && <> · {cleanCount} {t.firstTry}</>}
+              </p>
+              <button onClick={share}
+                      className="mt-6 w-full bg-gradient-to-r from-fuchsia-600 via-rose-500 to-amber-400 text-white font-black py-4 rounded-xl active:scale-[.98] transition">
+                📸 {t.share}
               </button>
-            )}
-
-            {(phase === 'solved' || phase === 'shown') && (
-              <button onClick={next}
-                      className="mt-3 w-full bg-gradient-to-r from-gold to-amber-300 text-ink font-black py-3.5 rounded-xl active:scale-[.98] transition">
-                {idx === queue.length - 1 ? t.seeResult : t.next}
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* ───────────── RESULTADO ───────────── */}
-        {screen === 'result' && (
-          <div className="bg-panel/80 backdrop-blur rounded-2xl p-6 ring-1 ring-white/10 shadow-xl text-center">
-            <div className="text-6xl mb-2">{nivel.e}</div>
-            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{t.yourElo}</p>
-            <p className="display text-6xl font-black text-gold tabular-nums">{elo}</p>
-            <h2 className="display mt-3 text-2xl font-black">{nivel.t}</h2>
-            <p className="text-gold font-bold">{nivel.s}</p>
-            <p className="mt-3 text-sm text-slate-300">{nivel.d}</p>
-            <p className="mt-4 text-sm text-slate-400 tabular-nums">
-              {t.hits}: <strong className="text-white">{solvedCount} / {results.length}</strong>
-              {cleanCount > 0 && <> · {cleanCount} {t.firstTry}</>}
-            </p>
-
-            <button onClick={share}
-                    className="mt-6 w-full bg-gradient-to-r from-fuchsia-600 via-rose-500 to-amber-400 text-white font-black py-4 rounded-xl active:scale-[.98] transition">
-              📸 {t.share}
-            </button>
-            <p className="mt-2 text-[11px] text-slate-500">
-              {t.shareHint.replace('{a}', IG_WFM).replace('{b}', IG_GM)}
-            </p>
-
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <button onClick={() => start(level)}
-                      className="bg-black/30 ring-1 ring-white/10 text-slate-200 font-bold py-3 rounded-xl active:scale-[.98] transition">
-                {t.retry}
-              </button>
-              <button onClick={() => setScreen('home')}
-                      className="bg-black/30 ring-1 ring-white/10 text-slate-200 font-bold py-3 rounded-xl active:scale-[.98] transition">
-                {t.changeLevel}
-              </button>
+              <p className="mt-2 text-[11px] text-slate-500">{t.shareHint}</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button onClick={() => start(level)}
+                        className="bg-black/30 ring-1 ring-white/10 text-slate-200 font-bold py-3 rounded-xl active:scale-[.98] transition">
+                  {t.retry}
+                </button>
+                <button onClick={() => setStage('pick')}
+                        className="bg-black/30 ring-1 ring-white/10 text-slate-200 font-bold py-3 rounded-xl active:scale-[.98] transition">
+                  {t.changeLevel}
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </Section>
 
-        <footer className="mt-6 text-center text-[11px] text-slate-500">{t.disclaimer}</footer>
-      </div>
+        {/* ─── HISTORIA ─── */}
+        <Section id="historia" eyebrow="03" title={t.historyTitle} lead={t.historyLead}>
+          <ol className="relative border-l border-white/15 ml-3">
+            {t.history.map((h, i) => (
+              <li key={i} className="ml-6 pb-7 last:pb-0">
+                <span className="absolute -left-[7px] mt-1.5 w-3.5 h-3.5 rounded-full bg-gold ring-4 ring-ink"></span>
+                <p className="text-gold text-xs font-black tracking-widest uppercase tabular-nums">{h.era}</p>
+                <h3 className="display text-lg font-black mt-0.5">{h.name}</h3>
+                <p className="mt-1.5 text-sm text-slate-300 leading-relaxed">{h.text}</p>
+              </li>
+            ))}
+          </ol>
+        </Section>
+
+        {/* ─── CONSEJOS ─── */}
+        <Section id="consejos" eyebrow="04" title={t.tipsTitle} lead={t.tipsLead}>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {t.tips.map((tip, i) => (
+              <div key={i} className="bg-panel/60 ring-1 ring-white/10 rounded-xl p-4">
+                <div className="flex items-baseline gap-2">
+                  <span className="display text-gold font-black tabular-nums">{i + 1}</span>
+                  <h3 className="font-black leading-tight">{tip.n}</h3>
+                </div>
+                <p className="mt-1.5 text-sm text-slate-300 leading-relaxed">{tip.d}</p>
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        <footer className="mt-16 pt-8 border-t border-white/10 text-center">
+          <Frieze />
+          <div className="mt-5 flex justify-center gap-4 flex-wrap">
+            {masters.map((m) => (
+              <a key={m.key} href={`https://instagram.com/${m.ig}`} target="_blank" rel="noopener noreferrer"
+                 className="text-sm font-bold text-slate-300 hover:text-gold transition">@{m.ig}</a>
+            ))}
+          </div>
+          <p className="mt-5 text-[11px] text-slate-500 max-w-md mx-auto leading-relaxed">{t.footerNote}</p>
+        </footer>
+      </main>
 
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white text-ink font-bold text-sm px-4 py-3 rounded-xl shadow-2xl max-w-[90vw] text-center">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-white text-ink font-bold text-sm px-4 py-3 rounded-xl shadow-2xl max-w-[90vw] text-center">
           {toast}
         </div>
       )}
