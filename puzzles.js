@@ -150,12 +150,15 @@ const PUZZLES = [
   {
     level: 'gm',
     rating: 2300,
-    fen: 'r4rk1/pp3ppp/8/3N4/8/R2Q4/PP4PP/6K1 w - - 0 1',
-    solution: ['Ne7+', 'Kh8', 'Qxh7+', 'Kxh7', 'Rh3#'],
+    /* Partida real: R. Lemon – M. Plum, Open de EEUU, St. Paul 1982,
+       tras 21.Cxc4. Juegan NEGRAS. */
+    fen: '1k1r3r/1pp2p2/p2p2p1/3P2p1/2N2n2/2P5/PP3PPP/3R1RK1 b - - 0 21',
+    solution: ['Ne2+', 'Kh1', 'Rxh2+', 'Kxh2', 'Rh8#'],
+    source: { es: 'Lemon – Plum · St. Paul, 1982', en: 'Lemon – Plum · St. Paul, 1982' },
     theme: { es: 'Mate de Anastasia', en: 'Anastasia’s mate' },
     explain: {
-      es: 'El caballo se instala en e7 y quita g8 y g6 al rey. Entonces la dama se entrega en h7 para abrir la columna y la torre remata desde h3.',
-      en: 'The knight settles on e7 and takes g8 and g6 from the king. Then the queen is sacrificed on h7 to open the file, and the rook finishes from h3.',
+      es: 'El caballo salta a e2 y le quita al rey las casillas g1 y g3. Entonces se entrega la torre en h2 para abrir la columna, y la otra torre remata desde h8. Ocurrió en una partida de verdad, en 1982.',
+      en: 'The knight jumps to e2 and takes g1 and g3 from the king. Then a rook is given up on h2 to open the file, and the other rook finishes from h8. It happened in a real game, in 1982.',
     },
   },
 

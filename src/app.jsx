@@ -9,6 +9,32 @@ const IG_WFM = 'wfm_manuchess';
 const IG_GM = 'gmcardosolab';
 const FIDE_WFM = 'https://ratings.fide.com/profile/4483103';
 const ANIO = new Date().getFullYear();
+const SITIO = 'https://lualeji7509-del.github.io/descubre-tu-elo/';
+
+/* Compartir: en el móvil abre el menú del sistema (WhatsApp, Instagram...);
+   si el navegador no lo admite, copia el enlace al portapapeles. */
+async function compartir({ titulo, texto, url }) {
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: titulo, text: texto, url });
+      return 'nativo';
+    } catch (e) {
+      if (e && e.name === 'AbortError') return 'cancelado';
+    }
+  }
+  const completo = `${texto}\n${url}`;
+  try {
+    await navigator.clipboard.writeText(completo);
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = completo;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+  }
+  return 'copiado';
+}
 
 /* ══════════════════════════════ TEXTOS / STRINGS ══════════════════════════ */
 
@@ -74,6 +100,9 @@ const T = {
     noEsLaPartida:
       'Posición de ejemplo, construida para que el patrón se vea claro. No es una partida concreta: este patrón se conoce por libros y manuscritos, no por una partida famosa.',
     gameLabel: 'Partida',
+    share2: 'Compartir',
+    shared: '¡Enlace copiado! Ya lo puedes pegar donde quieras',
+    sharePage: 'Compartir esta página',
     navClasses: 'Clases',
     navLive: 'En directo',
     ctaBook: 'Agenda tu clase',
@@ -152,7 +181,7 @@ const T = {
       {
         era: 'Siglo XVIII',
         name: 'Legado de Philidor',
-        text: 'Lleva el nombre de François-André Danican Philidor (1726–1795), el mejor jugador de su tiempo y además compositor de ópera. Pero no lo inventó él: el patrón ya aparece en el libro de Lucena de 1497. Philidor lo analizó en su tratado de 1749 y fue quien lo popularizó.',
+        text: 'Lleva el nombre de François-André Danican Philidor (1726–1795), el mejor jugador de su tiempo y además compositor de ópera. Pero no lo inventó él: el patrón ya aparece en el libro de Lucena de 1497. Philidor lo analizó en su tratado de 1749 y fue quien lo popularizó. Sigue apareciendo hoy: Grischuk se lo hizo a Ponomariov en Torshavn, en el año 2000.',
       },
       {
         era: '1803',
@@ -189,7 +218,7 @@ const T = {
     ],
     shareText: (elo, lvl, ok, total) =>
       `♟️ Descubre tu ELO con los Maestros ♟️\n\nMi resultado: ${lvl.t} — ${elo} ELO\n${lvl.s}\n` +
-      `Resolví ${ok} de ${total} problemas de ajedrez.\n\n¿Te atreves a superarme?\n\n` +
+      `Resolví ${ok} de ${total} problemas de ajedrez.\n\n¿Te atreves a superarme?\n${SITIO}\n\n` +
       `WFM Manuela Hernández @${IG_WFM}\nGM José Gabriel Cardoso @${IG_GM}\n\n#Ajedrez #Chess #ELO #DescubreTuELO`,
   },
 
@@ -254,6 +283,9 @@ const T = {
     noEsLaPartida:
       'Example position, built so the pattern reads clearly. It is not one specific game: this pattern is known from books and manuscripts, not from a famous game.',
     gameLabel: 'Game',
+    share2: 'Share',
+    shared: 'Link copied! Paste it wherever you like',
+    sharePage: 'Share this page',
     navClasses: 'Lessons',
     navLive: 'Live',
     ctaBook: 'Book a lesson',
@@ -369,7 +401,7 @@ const T = {
     ],
     shareText: (elo, lvl, ok, total) =>
       `♟️ Find your ELO with the Masters ♟️\n\nMy result: ${lvl.t} — ${elo} ELO\n${lvl.s}\n` +
-      `I solved ${ok} of ${total} chess puzzles.\n\nThink you can beat me?\n\n` +
+      `I solved ${ok} of ${total} chess puzzles.\n\nThink you can beat me?\n${SITIO}\n\n` +
       `WFM Manuela Hernández @${IG_WFM}\nGM José Gabriel Cardoso @${IG_GM}\n\n#Chess #Ajedrez #ELO #FindYourELO`,
   },
 };
@@ -848,6 +880,35 @@ function App() {
 
   /* Qué patrón de la sección de historia se está mostrando en tablero. */
   const [verPatron, setVerPatron] = useState(null);
+
+  /* Si alguien llega con un enlace del tipo …/#patron-2, se abre ese patrón. */
+  useEffect(() => {
+    const m = /^#patron-(\d+)$/.exec(window.location.hash || '');
+    if (m) {
+      const n = Number(m[1]);
+      setVerPatron(n);
+      setTimeout(() => document.getElementById('patron-' + n)?.scrollIntoView({ block: 'center' }), 300);
+    }
+  }, []);
+
+  /* Compartir un patrón concreto, con enlace directo a él. */
+  async function compartirPatron(i, h) {
+    const url = `${SITIO}#patron-${i}`;
+    const pz = puzzleDeHistoria(h.name);
+    const texto = `♟️ ${h.name} (${h.era})${pz && pz.source ? ` — ${pz.source[lang]}` : ''}`;
+    const r = await compartir({ titulo: h.name, texto, url });
+    if (r === 'copiado') showToast(t.shared);
+  }
+
+  /* Compartir la página entera. */
+  async function compartirPagina() {
+    const r = await compartir({
+      titulo: 'Descubre tu ELO con los Maestros',
+      texto: `♟️ ${t.title1} ${t.title2} — ${t.tagline}`,
+      url: SITIO,
+    });
+    if (r === 'copiado') showToast(t.shared);
+  }
   const puzzleDeHistoria = (nombre) => all.find((p) => norm(p.theme[lang]) === norm(nombre));
   const heroEra = useMemo(() => {
     if (!heroPuzzle) return '';
@@ -953,7 +1014,13 @@ function App() {
               >
                 {t.heroCta} <span className="inline-block transition group-hover:translate-x-1">→</span>
               </button>
-              <p className="t-label text-ivory/35">{t.heroMeta}</p>
+              <button
+                onClick={compartirPagina}
+                className="t-label text-ivory/45 ring-1 ring-line px-4 py-3 hover:text-gold hover:ring-gold/40 transition"
+              >
+                {t.share2} ↗
+              </button>
+              <p className="t-label text-ivory/35 w-full">{t.heroMeta}</p>
             </div>
           </div>
 
@@ -1244,7 +1311,8 @@ function App() {
             {t.history.map((h, i) => (
               <li
                 key={i}
-                className="reveal bg-ink p-5 sm:p-7 grid sm:grid-cols-[8rem_1fr] gap-2 sm:gap-7 hover:bg-panel transition"
+                id={`patron-${i}`}
+                className="reveal bg-ink p-5 sm:p-7 scroll-mt-20 grid sm:grid-cols-[8rem_1fr] gap-2 sm:gap-7 hover:bg-panel transition"
               >
                 <p className="display text-gold text-2xl sm:text-3xl font-black tabular-nums leading-none">
                   {h.era}
@@ -1268,6 +1336,13 @@ function App() {
                         >
                           {abierto ? t.hideMove : t.showMove}
                           <span aria-hidden="true">{abierto ? '×' : '▸'}</span>
+                        </button>
+                        <button
+                          onClick={() => compartirPatron(i, h)}
+                          className="mt-4 ml-2 inline-flex items-center gap-2 ring-1 ring-line text-ivory/60 t-label px-3 py-2 hover:text-gold hover:ring-gold/40 transition"
+                        >
+                          {t.share2}
+                          <span aria-hidden="true">↗</span>
                         </button>
                         {!abierto && <p className="mt-2 text-[11px] text-ivory/25">{t.spoiler}</p>}
                         {abierto && (
@@ -1404,6 +1479,12 @@ function App() {
               </a>
             ))}
           </div>
+          <button
+            onClick={compartirPagina}
+            className="mt-6 t-label text-gold ring-1 ring-gold/40 px-5 py-3 hover:bg-gold hover:text-ink transition"
+          >
+            {t.sharePage} ↗
+          </button>
           <p className="mt-6 t-label text-ivory/45">
             © {ANIO} Descubre tu ELO · {t.footerRights}
           </p>
