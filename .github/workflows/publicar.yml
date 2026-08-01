@@ -1,0 +1,63 @@
+# Publica la web sola cada vez que alguien cambia el contenido.
+#
+# Qué hace, en orden:
+#   1. Comprueba con un motor de ajedrez que TODOS los puzzles son correctos.
+#   2. Si alguno está mal, se detiene aquí y avisa. La web NO se toca:
+#      sigue funcionando con la última versión buena.
+#   3. Si todo está bien, regenera index.html y lo publica.
+#
+# Es decir: nadie puede romper la web publicando ajedrez incorrecto.
+
+name: Publicar la web
+
+on:
+  push:
+    branches: [main]
+    # Si el cambio es sólo la web ya generada o documentación, no hay que
+    # regenerar nada (esto además evita que el automatismo se llame a sí mismo).
+    paths-ignore:
+      - 'index.html'
+      - '**.md'
+  workflow_dispatch: # permite lanzarlo a mano desde la pestaña Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar-web
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el proyecto
+        uses: actions/checkout@v4
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Revisar los puzzles con el motor de ajedrez
+        run: npm run verify
+
+      - name: Regenerar la web
+        run: npm run build
+
+      - name: Publicar, si algo ha cambiado
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "La web no cambia. No hay nada que publicar."
+            exit 0
+          fi
+          git config user.name  "Publicación automática"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Regenerar la web tras los últimos cambios"
+          git push
+          echo "Web publicada. Estará visible en un par de minutos."

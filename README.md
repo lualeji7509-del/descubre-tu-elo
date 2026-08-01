@@ -16,6 +16,10 @@ dentro de un solo archivo.
 
 ## 📌 Añadir o cambiar puzzles
 
+> **¿Eres Manuela o José Gabriel?** Lee [**GUIA.md**](GUIA.md): explica cómo
+> subir tus retos desde el navegador, sin instalar nada.
+
+
 Todo vive en **[`puzzles.js`](puzzles.js)**. Es el único archivo que hay que tocar.
 
 ```js
@@ -38,6 +42,11 @@ letras inglesas** (K Q R B N), porque es lo que entiende el motor. La app las
 traduce sola a español (R D T A C) al mostrarlas.
 
 ### Después de editar
+
+**Si editas desde la web de GitHub, no hay que hacer nada más:** un automatismo
+revisa los puzzles y publica solo. Ver [GUIA.md](GUIA.md).
+
+Si trabajas en local:
 
 ```bash
 npm install      # solo la primera vez
@@ -81,6 +90,7 @@ Es orientativo y con fines divulgativos: **no es un ELO oficial FIDE**.
 | [`src/app.jsx`](src/app.jsx) | Tablero, validación, idiomas y cálculo de ELO. |
 | [`verify.mjs`](verify.mjs) | Comprueba que los puzzles son correctos. |
 | [`build.mjs`](build.mjs) | Genera el archivo final. |
+| [`.github/workflows/publicar.yml`](.github/workflows/publicar.yml) | Revisa y publica sola la web en cada cambio. |
 | `index.html` | **Generado.** No se edita a mano. |
 
 Los puzzles no fueron propuestos por Manuela ni por José Gabriel: son
