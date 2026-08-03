@@ -1,2 +1,10 @@
 node_modules/
 .DS_Store
+.claude/
+*.bak
+.env
+*.pem
+*.key
+
+# Capturas que deja el test de navegador cada vez que se ejecuta (test-e2e.cjs).
+v2-*.png

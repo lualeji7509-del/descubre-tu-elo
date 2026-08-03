@@ -90,8 +90,9 @@ Es orientativo y con fines divulgativos: **no es un ELO oficial FIDE**.
 | [`src/app.jsx`](src/app.jsx) | Tablero, validación, idiomas y cálculo de ELO. |
 | [`verify.mjs`](verify.mjs) | Comprueba que los puzzles son correctos. |
 | [`build.mjs`](build.mjs) | Genera el archivo final. |
+| [`og/`](og/LEEME.md) | La tarjeta con foto que sale al compartir el enlace. |
 | [`.github/workflows/publicar.yml`](.github/workflows/publicar.yml) | Revisa y publica sola la web en cada cambio. |
-| `index.html` | **Generado.** No se edita a mano. |
+| `index.html` · `og.png` | **Generados.** No se editan a mano. |
 
 Los puzzles no fueron propuestos por Manuela ni por José Gabriel: son
 combinaciones clásicas elegidas para el proyecto. Ellos aparecen como

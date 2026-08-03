@@ -123,6 +123,49 @@ const FOTOS = `window.FOTOS = {
   eiffel:  ${JSON.stringify(foto('eiffel.jpg'))}
 };`;
 
+/* 4d · vista previa al compartir el enlace.
+       Cuando alguien pega la dirección en WhatsApp, Instagram o Telegram, esa
+       aplicación lee estas etiquetas para dibujar la tarjeta con foto y titular.
+       Sin ellas el enlace sale desnudo y casi nadie lo abre.
+
+       La imagen va con dirección COMPLETA (https://…) a propósito: quien la
+       descarga es el servidor de WhatsApp, no el móvil de quien recibe el enlace.
+       Por eso no rompe la regla de «cero peticiones a internet»: el navegador del
+       visitante sigue sin pedir nada.
+
+       El `?v=` del final permite forzar el refresco. WhatsApp guarda la tarjeta
+       durante días; si algún día se cambia og.png, se sube ese número. */
+const WEB = 'https://lualeji7509-del.github.io/descubre-tu-elo/';
+const OG_IMG = WEB + 'og.png?v=1';
+const TITULO = 'Descubre tu ELO con los Maestros';
+const DESC_ES =
+  'Test de ajedrez con tablero jugable: mueve las piezas, resuelve 9 combinaciones ' +
+  'y descubre tu ELO estimado. Con la WFM Manuela Hernández y el GM José Gabriel Cardoso.';
+const DESC_EN =
+  'Playable chess quiz: move the pieces, solve 9 combinations and find out your ' +
+  'estimated ELO. With WFM Manuela Hernández and GM José Gabriel Cardoso.';
+
+const META = `
+<meta name="description" content="${DESC_ES} · ${DESC_EN}">
+<link rel="canonical" href="${WEB}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="${TITULO}">
+<meta property="og:url" content="${WEB}">
+<meta property="og:title" content="${TITULO}">
+<meta property="og:description" content="${DESC_ES}">
+<meta property="og:image" content="${OG_IMG}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Descubre tu ELO con los Maestros — con la WFM Manuela Hernández y el GM José Gabriel Cardoso">
+<meta property="og:locale" content="es_ES">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${TITULO}">
+<meta name="twitter:description" content="${DESC_ES}">
+<meta name="twitter:image" content="${OG_IMG}">
+<meta name="theme-color" content="#08090c">`;
+
 /* 5 · montaje final. puzzles.js va tal cual, arriba y editable. */
 writeFileSync(at('index.html'), `<!DOCTYPE html>
 <html lang="es">
@@ -130,7 +173,7 @@ writeFileSync(at('index.html'), `<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♞</text></svg>">
-<title>Descubre tu ELO con los Maestros · Find your ELO with the Masters</title>
+<title>Descubre tu ELO con los Maestros · Find your ELO with the Masters</title>${META}
 <style>${readFileSync(join(tmp, 'out.css'), 'utf8')}</style>
 <style>${css}</style>
 </head>

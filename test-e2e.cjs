@@ -64,12 +64,17 @@ const userMoves = (p) => {          // [{from,to}] de las jugadas que hace el us
   }
 
   // ── resultado
-  const elo = Number(await p.locator('p.display.text-6xl').innerText());
+  // Se busca por `data-elo`, no por clases de estilo: las clases cambian cada vez
+  // que se retoca el diseño y dejan el test roto sin que nadie se entere.
+  const elo = Number(await p.locator('p[data-elo]').innerText());
   ok(`resultado con ELO calculado (${elo})`, elo > 0);
   ok('resolvió todos', /5 \/ 5|4 \/ 4/.test(await p.getByText(/Resueltos:/).innerText()));
   await p.screenshot({ path: 'v2-resultado.png' });
 
-  await p.getByRole('button', { name: /Compartir/ }).click(); await p.waitForTimeout(400);
+  // Hay varios botones de compartir en la página (uno por mate famoso, más el del
+  // pie): hay que nombrar el del resultado, no un «Compartir» a secas.
+  await p.getByRole('button', { name: /Compartir mi resultado/ }).click();
+  await p.waitForTimeout(400);
   const clip = await p.evaluate(() => navigator.clipboard.readText());
   ok('el botón copia el texto de Instagram', clip.includes('@wfm_manuchess') && clip.includes('@gmcardosolab'));
   console.log('\n--- PORTAPAPELES ---\n' + clip + '\n');

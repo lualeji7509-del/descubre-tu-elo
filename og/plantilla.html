@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!--
+  Plantilla de la IMAGEN DE VISTA PREVIA (la que sale al pegar el enlace en
+  WhatsApp, Instagram o Telegram).  Template for the link preview image.
+
+  No forma parte de la web. Se abre, se hace una captura de 1200x630 y el
+  resultado se guarda como og.png en la raíz. Instrucciones en og/LEEME.md.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* Mismos colores que la web: negro casi puro, marfil y un solo acento de latón. */
+  body {
+    width: 1200px; height: 630px; overflow: hidden;
+    background: #08090c; color: #efe9dc;
+    font-family: 'Bitstream Charter', 'Liberation Serif', 'DejaVu Serif', serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+
+  /* Retícula de tablero al fondo, muy tenue, como en la web. */
+  body::before {
+    content: ''; position: absolute; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(45deg, rgba(217,164,65,.05) 25%, transparent 25%, transparent 75%, rgba(217,164,65,.05) 75%),
+      linear-gradient(45deg, rgba(217,164,65,.05) 25%, transparent 25%, transparent 75%, rgba(217,164,65,.05) 75%);
+    background-size: 160px 160px;
+    background-position: 0 0, 80px 80px;
+    -webkit-mask-image: radial-gradient(110% 90% at 78% 0%, #000 0%, transparent 72%);
+  }
+
+  /* Filete superior con las casillas del tablero. */
+  .rule {
+    height: 10px; flex: none; z-index: 2;
+    background-image: linear-gradient(90deg, #d9a441 50%, transparent 50%);
+    background-size: 20px 10px;
+    opacity: .55;
+  }
+
+  .main { flex: 1; z-index: 1; padding: 58px 64px 0; }
+
+  .eyebrow {
+    font-family: 'Liberation Sans', 'DejaVu Sans', sans-serif;
+    font-size: 19px; letter-spacing: .34em; text-transform: uppercase;
+    font-weight: 700; color: #d9a441;
+  }
+
+  h1 {
+    margin-top: 26px;
+    font-size: 118px; line-height: .9; letter-spacing: -.035em;
+    font-weight: 700;
+  }
+  h1 .gold { color: #d9a441; display: block; font-size: 74px; letter-spacing: -.02em; margin-top: 12px; }
+
+  .lead {
+    margin-top: 30px; font-size: 30px; color: rgba(239,233,220,.62);
+    font-family: 'Liberation Sans', 'DejaVu Sans', sans-serif;
+  }
+
+  /* Franja inferior con los dos protagonistas. */
+  .masters {
+    z-index: 1; flex: none;
+    border-top: 1px solid #23262f; background: rgba(18,20,26,.72);
+    padding: 26px 64px; display: flex; gap: 56px; align-items: center;
+  }
+  .m { display: flex; align-items: center; gap: 18px; }
+  .m .foto {
+    width: 74px; height: 74px; border-radius: 50%; flex: none;
+    border: 2px solid rgba(217,164,65,.5);
+    background-repeat: no-repeat;
+  }
+  /* La foto de Manuela es una escena de torneo y ella ocupa solo un trozo:
+     a este tamaño, sin acercar, sale el tablero borroso en vez de su cara. */
+  .foto-manuela { background-image: url('../img/manuela.jpg');
+                  background-size: 235%; background-position: 74% 26%; }
+  .foto-cardoso { background-image: url('../img/cardoso.jpg');
+                  background-size: cover; background-position: center; }
+  .m .title {
+    font-family: 'Liberation Sans', 'DejaVu Sans', sans-serif;
+    font-size: 15px; letter-spacing: .22em; text-transform: uppercase;
+    font-weight: 700; color: #d9a441;
+  }
+  .m .name { font-size: 27px; font-weight: 700; margin-top: 4px; line-height: 1.1; }
+  .m .elo  { font-size: 19px; color: rgba(239,233,220,.45); margin-top: 2px;
+             font-family: 'Liberation Sans', 'DejaVu Sans', sans-serif; }
+</style>
+</head>
+<body>
+  <div class="rule"></div>
+
+  <div class="main">
+    <div class="eyebrow">Ajedrez · Test de nivel</div>
+    <h1>
+      Descubre tu ELO
+      <span class="gold">con los Maestros</span>
+    </h1>
+    <p class="lead">Tablero jugable · 9 combinaciones · Español / English</p>
+  </div>
+
+  <div class="masters">
+    <div class="m">
+      <div class="foto foto-manuela"></div>
+      <div>
+        <div class="title">WFM</div>
+        <div class="name">Manuela Hernández</div>
+        <div class="elo">ELO 2020</div>
+      </div>
+    </div>
+    <div class="m">
+      <div class="foto foto-cardoso"></div>
+      <div>
+        <div class="title">GM</div>
+        <div class="name">José Gabriel Cardoso</div>
+        <div class="elo">ELO 2518</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -133,7 +133,8 @@ const T = {
     liveLead:
       'Torneos, partidas comentadas y anuncios de clases: todo lo publican en sus perfiles. Síguelos para no perdértelo.',
     liveFollow: 'Seguir',
-    liveSoon: '¿Tienen canal de Twitch o YouTube? Cuando lo compartan, aparecerá aquí.',
+    liveSoon:
+      '¿Tienen canal de TikTok, Twitch o YouTube? Cuando lo compartan, aparecerá aquí.',
 
     footerRights: 'Todos los derechos reservados.',
     photoCaption: 'Manuela y José Gabriel, partida improvisada bajo la Torre Eiffel.',
@@ -315,7 +316,8 @@ const T = {
     liveLead:
       'Tournaments, annotated games and lesson announcements all go up on their profiles. Follow them so you do not miss it.',
     liveFollow: 'Follow',
-    liveSoon: 'Do they have a Twitch or YouTube channel? Once they share it, it will show up here.',
+    liveSoon:
+      'Do they have a TikTok, Twitch or YouTube channel? Once they share it, it will show up here.',
 
     footerRights: 'All rights reserved.',
     photoCaption: 'Manuela and José Gabriel, an impromptu game under the Eiffel Tower.',
