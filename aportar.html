@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<!--
+  Formulario para que Manuela y José Gabriel manden sus propios retos sin
+  tocar código. No guarda nada en ningún sitio: solo arma un mensaje de texto
+  y lo entrega por WhatsApp o copiado, para que Luis (o quien lleve el
+  proyecto) lo convierta en un puzzle real. Sin esta página, la alternativa
+  era editar puzzles.js a mano en GitHub — sigue existiendo, pero esta es
+  la forma pensada para quien no programa.
+
+  No está enlazada desde la portada a propósito: es una herramienta para
+  ellos dos, no un formulario público.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Manda tu reto · Descubre tu ELO con los Maestros</title>
+<style>
+  :root {
+    --ink: #08090c; --panel: #12141a; --line: #23262f;
+    --ivory: #efe9dc; --gold: #d9a441; --ember: #e4572e;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; background: var(--ink); color: var(--ivory);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 28px 18px 60px;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; }
+  .display { font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif; }
+
+  header { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+  header svg { width: 26px; height: 26px; flex: none; }
+  header span { font-weight: 800; letter-spacing: -.01em; }
+
+  h1 { font-size: clamp(1.8rem, 7vw, 2.3rem); line-height: 1.05; margin: 0 0 10px; letter-spacing: -.02em; }
+  .lead { color: rgba(239,233,220,.62); line-height: 1.5; margin: 0 0 30px; font-size: .96rem; }
+
+  fieldset { border: 0; padding: 0; margin: 0 0 24px; }
+  legend {
+    font-size: .68rem; letter-spacing: .28em; text-transform: uppercase;
+    font-weight: 700; color: var(--gold); padding: 0 0 10px; width: 100%;
+  }
+  label.campo { display: block; margin-bottom: 18px; }
+  label.campo > span.n {
+    display: block; font-weight: 700; font-size: .92rem; margin-bottom: 6px;
+  }
+  label.campo > span.h {
+    display: block; font-size: .8rem; color: rgba(239,233,220,.45);
+    margin-top: 5px; line-height: 1.4;
+  }
+  input[type="text"], textarea, select {
+    width: 100%; background: var(--panel); color: var(--ivory);
+    border: 1px solid var(--line); padding: 12px 14px; font-size: 1rem;
+    border-radius: 2px; font-family: inherit;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    outline: 2px solid var(--gold); outline-offset: 1px; border-color: var(--gold);
+  }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.4; }
+
+  .quien { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quien input { position: absolute; opacity: 0; pointer-events: none; }
+  .quien span.opt {
+    display: block; text-align: center; padding: 16px 10px;
+    background: var(--panel); border: 1px solid var(--line); cursor: pointer;
+    font-weight: 800;
+  }
+  .quien span.opt small { display: block; font-weight: 600; color: rgba(239,233,220,.5); margin-top: 3px; font-size: .78rem; }
+  .quien input:checked + span.opt { border-color: var(--gold); background: rgba(217,164,65,.1); color: var(--gold); }
+
+  .si-no { display: flex; gap: 10px; margin-bottom: 14px; }
+  .si-no input { position: absolute; opacity: 0; pointer-events: none; }
+  .si-no span.opt {
+    padding: 9px 18px; background: var(--panel); border: 1px solid var(--line);
+    cursor: pointer; font-weight: 700; font-size: .85rem;
+  }
+  .si-no input:checked + span.opt { border-color: var(--gold); background: rgba(217,164,65,.1); color: var(--gold); }
+
+  #datosPartida { display: none; padding: 4px 0 0 0; }
+  #datosPartida.on { display: block; }
+
+  a.ayuda {
+    display: inline-block; margin-top: 8px; font-size: .8rem;
+    color: var(--gold); text-decoration: none; border-bottom: 1px dotted var(--gold);
+  }
+
+  button#armar {
+    width: 100%; background: var(--gold); color: var(--ink); border: 0;
+    font-weight: 800; font-size: 1.02rem; padding: 16px; margin-top: 8px;
+    cursor: pointer; border-radius: 2px;
+  }
+  button#armar:active { transform: scale(.98); }
+
+  #error {
+    display: none; background: rgba(228,87,46,.12); border: 1px solid rgba(228,87,46,.4);
+    color: #ff9d80; padding: 12px 14px; font-size: .85rem; margin-top: 14px;
+  }
+  #error.on { display: block; }
+
+  #resultado { display: none; margin-top: 34px; }
+  #resultado.on { display: block; }
+  #resultado h2 { font-size: 1.2rem; margin: 0 0 4px; }
+  #resultado p.h { color: rgba(239,233,220,.5); font-size: .85rem; margin: 0 0 16px; }
+  #previa {
+    width: 100%; background: var(--panel); border: 1px solid var(--line);
+    color: var(--ivory); font-size: .85rem; padding: 14px; white-space: pre-wrap;
+    line-height: 1.55; min-height: 220px; font-family: ui-monospace, monospace;
+  }
+  .acciones { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .acciones a, .acciones button {
+    flex: 1; min-width: 140px; text-align: center; padding: 13px; font-weight: 800;
+    font-size: .9rem; text-decoration: none; cursor: pointer; border-radius: 2px;
+  }
+  a.whatsapp { background: #25D366; color: #062910; border: 0; }
+  button.copiar { background: transparent; color: var(--ivory); border: 1px solid var(--line); }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px);
+    background: var(--gold); color: var(--ink); padding: 11px 20px; font-weight: 800;
+    font-size: .85rem; border-radius: 2px; opacity: 0; pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+  }
+  #toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  footer { margin-top: 46px; text-align: center; font-size: .75rem; color: rgba(239,233,220,.3); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <!-- Mismo caballo que el resto de la web: pieza Cburnett (CC BY-SA 3.0,
+         Cburnett y Rfc1394 en Wikimedia Commons). Ver el crédito completo
+         en img/piezas-cburnett.svg y en el pie de index.html. -->
+    <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g stroke-linecap="round" stroke-linejoin="round" transform="translate(6,6)" stroke="#efe9dc">
+        <path d="M13.5757576,2.625 C22.4848485,3.5 27.5757576,9.625 27.1515152,28 L7.63636364,28 C7.63636364,20.125 16.1212121,22.3125 14.4242424,9.625" stroke-width="1.5" fill="#efe9dc"/>
+        <path d="M15.2727273,9.625 C15.5951515,12.17125 10.5636364,16.07375 8.48484848,17.5 C5.93939394,19.25 6.09212121,21.2975 4.24242424,21 C3.35830303,20.1775 5.43878788,18.34 4.24242424,18.375 C3.39393939,18.375 4.40363636,19.45125 3.39393939,20.125 C2.54545455,20.125 -0.00254545455,21 -1.90580876e-06,16.625 C-1.90580876e-06,14.875 5.09090909,6.125 5.09090909,6.125 C5.09090909,6.125 6.69454545,4.4625 6.78787879,3.0625 C6.16848485,2.19275 6.36363636,1.3125 6.36363636,0.4375 C7.21212121,-0.4375 8.90909091,2.625 8.90909091,2.625 L10.6060606,2.625 C10.6060606,2.625 11.2678788,0.882 12.7272727,0 C13.5757576,0 13.5757576,2.625 13.5757576,2.625" stroke-width="1.5" fill="#efe9dc"/>
+      </g>
+    </svg>
+    <span class="display">Descubre tu ELO</span>
+  </header>
+
+  <h1 class="display">Manda tu reto</h1>
+  <p class="lead">
+    Sin código, sin GitHub. Rellena esto con tu jugada y al final se arma un
+    mensaje listo para mandar por WhatsApp. Lo revisamos con un motor de
+    ajedrez y, si está bien, se publica solo.
+  </p>
+
+  <form id="f" novalidate>
+
+    <fieldset>
+      <legend>¿Quién eres?</legend>
+      <div class="quien">
+        <label>
+          <input type="radio" name="quien" value="wfm" required>
+          <span class="opt">WFM<small>Manuela</small></span>
+        </label>
+        <label>
+          <input type="radio" name="quien" value="gm">
+          <span class="opt">GM<small>José Gabriel</small></span>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>La posición</legend>
+      <label class="campo">
+        <span class="n">Posición (FEN)</span>
+        <input type="text" id="fen" placeholder="Pega aquí el texto FEN" autocomplete="off">
+        <span class="h">
+          Entra en lichess.org/editor, coloca las piezas arrastrando, elige de
+          quién es el turno y copia el texto de abajo del tablero. Es una
+          fila de letras y números tipo <code>6k1/1b3ppp/8/…</code>
+        </span>
+        <a class="ayuda" href="https://lichess.org/editor" target="_blank" rel="noopener noreferrer">Abrir lichess.org/editor ↗</a>
+      </label>
+
+      <label class="campo">
+        <span class="n">Dificultad aproximada, en ELO</span>
+        <select id="rating">
+          <option value="1000">Muy fácil (~1000)</option>
+          <option value="1300" selected>Fácil (~1300)</option>
+          <option value="1600">Media (~1600)</option>
+          <option value="2000">Difícil (~2000)</option>
+          <option value="2300">Muy difícil (~2300)</option>
+        </select>
+        <span class="h">No hace falta ser exacto: es solo para colocarla en el nivel que le toca.</span>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>La solución</legend>
+      <label class="campo">
+        <span class="n">Las jugadas, en orden</span>
+        <input type="text" id="solucion" placeholder="Ej: Nf7+, Kg8, Nxd8" autocomplete="off">
+        <span class="h">
+          Se alternan: la primera es la que resuelve el reto, la segunda la
+          respuesta forzada del rival, y así. Si es una sola jugada, escribe
+          solo esa. Usa notación normal (Cf3, Dxh7+, Txe8#) — la escribimos
+          bien al pasarla al sistema.
+        </span>
+      </label>
+
+      <label class="campo">
+        <span class="n">Nombre corto del patrón</span>
+        <input type="text" id="tema" placeholder="Ej: Tenedor de caballo" autocomplete="off">
+      </label>
+
+      <label class="campo">
+        <span class="n">¿Por qué funciona? (una o dos frases)</span>
+        <textarea id="explicacion" placeholder="Ej: El caballo ataca la dama y la torre a la vez, y el rey no puede capturarlo."></textarea>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>¿Es de una partida real?</legend>
+      <div class="si-no">
+        <label>
+          <input type="radio" name="real" value="no" checked>
+          <span class="opt">No, es un ejemplo</span>
+        </label>
+        <label>
+          <input type="radio" name="real" value="si">
+          <span class="opt">Sí, la jugué yo</span>
+        </label>
+      </div>
+      <div id="datosPartida">
+        <label class="campo">
+          <span class="n">Contra quién, dónde y cuándo</span>
+          <input type="text" id="origen" placeholder="Ej: vs Jonathan Pierre, Open Aix-en-Provence, 2026" autocomplete="off">
+          <span class="h">
+            Esto sale en la web citándote a ti como protagonista de una
+            partida real. Solo rellena si es cierto — nada de partidas
+            inventadas para rellenar el hueco.
+          </span>
+        </label>
+      </div>
+    </fieldset>
+
+    <button type="submit" id="armar">Armar el mensaje ↓</button>
+    <div id="error"></div>
+  </form>
+
+  <div id="resultado">
+    <h2 class="display">Listo</h2>
+    <p class="h">Revísalo y mándalo. No se guarda en ningún sitio hasta que lo envíes.</p>
+    <textarea id="previa" readonly></textarea>
+    <div class="acciones">
+      <a href="#" id="btnWhatsapp" class="whatsapp" target="_blank" rel="noopener noreferrer">Enviar por WhatsApp</a>
+      <button type="button" id="btnCopiar" class="copiar">Copiar mensaje</button>
+    </div>
+  </div>
+
+  <footer>Descubre tu ELO con los Maestros · esta página no guarda nada</footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  var qs = function (s) { return document.querySelector(s); };
+
+  var form = qs('#f');
+  var real = form.elements['real'];
+  var datosPartida = qs('#datosPartida');
+
+  Array.prototype.forEach.call(real, function (r) {
+    r.addEventListener('change', function () {
+      datosPartida.classList.toggle('on', qs('input[name="real"]:checked').value === 'si');
+    });
+  });
+
+  function toast(msg) {
+    var t = qs('#toast');
+    t.textContent = msg;
+    t.classList.add('on');
+    setTimeout(function () { t.classList.remove('on'); }, 2200);
+  }
+
+  function mostrarError(msg) {
+    var e = qs('#error');
+    e.textContent = msg;
+    e.classList.add('on');
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    qs('#error').classList.remove('on');
+
+    var quienEl = qs('input[name="quien"]:checked');
+    var fen = qs('#fen').value.trim();
+    var rating = qs('#rating').value;
+    var solucion = qs('#solucion').value.trim();
+    var tema = qs('#tema').value.trim();
+    var explicacion = qs('#explicacion').value.trim();
+    var esReal = qs('input[name="real"]:checked').value === 'si';
+    var origen = qs('#origen').value.trim();
+
+    if (!quienEl) return mostrarError('Marca si eres WFM o GM.');
+    if (!fen) return mostrarError('Falta la posición (FEN).');
+    if (fen.split(' ')[0].split('/').length !== 8) {
+      return mostrarError('Ese FEN no tiene 8 filas separadas por "/". Cópialo de nuevo desde lichess.org/editor.');
+    }
+    if (!solucion) return mostrarError('Falta al menos una jugada.');
+    if (!tema) return mostrarError('Falta el nombre corto del patrón.');
+    if (!explicacion) return mostrarError('Falta la explicación de por qué funciona.');
+    if (esReal && !origen) return mostrarError('Marcaste que es una partida real: falta contra quién, dónde y cuándo.');
+
+    var quien = quienEl.value === 'wfm' ? 'Manuela (WFM)' : 'José Gabriel (GM)';
+
+    var lineas = [
+      '🎁 Nuevo reto — Descubre tu ELO',
+      '',
+      'De: ' + quien,
+      'Dificultad: ~' + rating + ' ELO',
+      'Posición (FEN): ' + fen,
+      'Jugadas: ' + solucion,
+      'Patrón: ' + tema,
+      'Por qué funciona: ' + explicacion,
+      '¿Partida real?: ' + (esReal ? 'Sí — ' + origen : 'No, es un ejemplo'),
+    ];
+    var texto = lineas.join('\n');
+
+    qs('#previa').value = texto;
+    qs('#btnWhatsapp').href = 'https://wa.me/?text=' + encodeURIComponent(texto);
+    qs('#resultado').classList.add('on');
+    qs('#resultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  qs('#btnCopiar').addEventListener('click', function () {
+    var texto = qs('#previa').value;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(texto).then(function () { toast('Copiado'); });
+    } else {
+      qs('#previa').select();
+      document.execCommand('copy');
+      toast('Copiado');
+    }
+  });
+})();
+</script>
+</body>
+</html>
