@@ -78,6 +78,8 @@ const T = {
     illegal: 'Esa jugada no es legal.',
     solved: '¡Resuelto!',
     solvedClean: '¡Resuelto a la primera!',
+    solvedDraw: '¡Tablas conseguidas!',
+    solvedCleanDraw: '¡Tablas a la primera!',
     showSolution: 'Ver la solución',
     shown: 'Ésta era la solución',
     next: 'Siguiente problema',
@@ -262,6 +264,8 @@ const T = {
     illegal: 'That move is not legal.',
     solved: 'Solved!',
     solvedClean: 'Solved first try!',
+    solvedDraw: 'Draw secured!',
+    solvedCleanDraw: 'Draw secured, first try!',
     showSolution: 'Show the solution',
     shown: 'This was the solution',
     next: 'Next puzzle',
@@ -749,7 +753,11 @@ function App() {
 
   function finish(solved) {
     setPhase(solved ? 'solved' : 'shown');
-    setMsg({ kind: 'ok', text: solved ? (mistakes === 0 ? t.solvedClean : t.solved) : t.shown });
+    const esTablas = puzzle.outcome === 'draw';
+    const textoSolved = mistakes === 0
+      ? (esTablas ? t.solvedCleanDraw : t.solvedClean)
+      : (esTablas ? t.solvedDraw : t.solved);
+    setMsg({ kind: 'ok', text: solved ? textoSolved : t.shown });
     setResults((r) => [...r, { rating: puzzle.rating, solved, mistakes }]);
   }
 

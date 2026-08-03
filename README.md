@@ -28,6 +28,7 @@ Todo vive en **[`puzzles.js`](puzzles.js)**. Es el único archivo que hay que to
   rating: 1300,                                    // dificultad en ELO
   fen: '1r1q3k/p5pp/8/4N3/8/8/5PPP/6K1 w - - 0 1', // la posición
   solution: ['Nf7+', 'Kg8', 'Nxd8'],               // jugadas: tú, rival, tú...
+  outcome: 'win',                                   // 'mate' · 'win' · 'draw'
   theme:   { es: 'Tenedor de caballo', en: 'Knight fork' },
   explain: { es: 'El caballo ataca…',  en: 'The knight attacks…' },
 }
@@ -40,6 +41,15 @@ de abajo.
 **Ojo con la notación:** las jugadas de `solution` se escriben **siempre con las
 letras inglesas** (K Q R B N), porque es lo que entiende el motor. La app las
 traduce sola a español (R D T A C) al mostrarlas.
+
+**El campo `outcome` dice qué consigue la jugada**, y no todos se comprueban
+igual:
+
+| `outcome` | Qué es | ¿Se comprueba solo? |
+|---|---|---|
+| `'mate'` | Termina en jaque mate | ✅ Sí, con el motor: si la última jugada no lleva `#` y sí es mate (o al revés), `verify.mjs` lo rechaza |
+| `'win'` | Gana material o la partida, sin mate | Solo la legalidad de las jugadas |
+| `'draw'` | Salva tablas (defensa) | ❌ No — haría falta una tabla de finales, que no está disponible aquí. Se publica confiando en el criterio de quien lo manda |
 
 ### Después de editar
 

@@ -35,7 +35,13 @@ PUZZLES.forEach((p, i) => {
     }
   }
 
-  // 2. Si la última jugada dice mate (#), debe ser mate de verdad.
+  // 2. El campo 'outcome' es obligatorio y tiene que ser uno de los tres.
+  if (!['mate', 'win', 'draw'].includes(p.outcome)) {
+    return aviso(i, `${etiqueta} — falta 'outcome' o no es 'mate' / 'win' / 'draw'.`);
+  }
+
+  // 3. Si la última jugada dice mate (#), debe ser mate de verdad — y al revés.
+  //    Esto es 100% comprobable: chess.js sabe con certeza si hay mate o no.
   const ultima = p.solution[p.solution.length - 1];
   if (ultima.includes('#') && !c.isCheckmate()) {
     aviso(i, `${etiqueta} — "${ultima}" lleva # pero NO es mate.`);
@@ -43,8 +49,22 @@ PUZZLES.forEach((p, i) => {
   if (!ultima.includes('#') && c.isCheckmate()) {
     aviso(i, `${etiqueta} — es mate pero "${ultima}" no lleva #.`);
   }
+  if (p.outcome === 'mate' && !ultima.includes('#')) {
+    aviso(i, `${etiqueta} — outcome es 'mate' pero la última jugada no lleva #.`);
+  }
+  if (p.outcome !== 'mate' && ultima.includes('#')) {
+    aviso(i, `${etiqueta} — la última jugada lleva # (es mate), pero outcome no es 'mate'.`);
+  }
 
-  // 3. Las respuestas del rival (posiciones pares) deberían ser forzadas o casi.
+  // El caso 'draw' NO se puede comprobar aquí: haría falta una tabla de finales
+  // (endgame tablebase), y no hay acceso a una desde donde corre este script.
+  // Se avisa siempre, para que quede claro que esta es la única parte de un
+  // puzzle que depende del criterio de quien lo manda, no de una prueba.
+  if (p.outcome === 'draw') {
+    console.log(`  ⚠ #${i + 1}  ${etiqueta} — 'draw' sin comprobar (hace falta tabla de finales, no disponible). Se confía en quien lo aportó.`);
+  }
+
+  // 4. Las respuestas del rival (posiciones pares) deberían ser forzadas o casi.
   //    Avisamos si el rival tenía muchas alternativas: el puzzle sería ambiguo.
   const c2 = new Chess(p.fen);
   p.solution.forEach((san, n) => {
@@ -57,7 +77,7 @@ PUZZLES.forEach((p, i) => {
     c2.move(san);
   });
 
-  // 4. Si la solución es un mate forzado, ninguna OTRA primera jugada
+  // 5. Si la solución es un mate forzado, ninguna OTRA primera jugada
   //    debería dar mate igual de rápido: si no, hay varias soluciones.
   if (ultima.includes('#')) {
     const jugadasUsuario = Math.ceil(p.solution.length / 2);

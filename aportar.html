@@ -208,6 +208,21 @@
       </label>
 
       <label class="campo">
+        <span class="n">¿Qué consigue esa jugada?</span>
+        <select id="objetivo">
+          <option value="mate">Da jaque mate</option>
+          <option value="win">Gana material o la partida (sin mate)</option>
+          <option value="draw">Salva tablas (defensa)</option>
+        </select>
+        <span class="h">
+          Si es "salva tablas": esto no lo puede comprobar un motor de
+          ajedrez normal —haría falta una tabla de finales—, así que se
+          publica confiando en tu criterio. Dilo igual, para que quede claro
+          en la web que es una jugada defensiva y no una que gana.
+        </span>
+      </label>
+
+      <label class="campo">
         <span class="n">Nombre corto del patrón</span>
         <input type="text" id="tema" placeholder="Ej: Tenedor de caballo" autocomplete="off">
       </label>
@@ -297,6 +312,7 @@
     var fen = qs('#fen').value.trim();
     var rating = qs('#rating').value;
     var solucion = qs('#solucion').value.trim();
+    var objetivo = qs('#objetivo').value;
     var tema = qs('#tema').value.trim();
     var explicacion = qs('#explicacion').value.trim();
     var esReal = qs('input[name="real"]:checked').value === 'si';
@@ -313,6 +329,7 @@
     if (esReal && !origen) return mostrarError('Marcaste que es una partida real: falta contra quién, dónde y cuándo.');
 
     var quien = quienEl.value === 'wfm' ? 'Manuela (WFM)' : 'José Gabriel (GM)';
+    var objetivoTexto = { mate: 'Da jaque mate', win: 'Gana material o la partida', draw: 'Salva tablas (defensa)' }[objetivo];
 
     var lineas = [
       '🎁 Nuevo reto — Descubre tu ELO',
@@ -321,6 +338,7 @@
       'Dificultad: ~' + rating + ' ELO',
       'Posición (FEN): ' + fen,
       'Jugadas: ' + solucion,
+      'Consigue: ' + objetivoTexto,
       'Patrón: ' + tema,
       'Por qué funciona: ' + explicacion,
       '¿Partida real?: ' + (esReal ? 'Sí — ' + origen : 'No, es un ejemplo'),

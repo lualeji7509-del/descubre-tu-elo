@@ -48,6 +48,7 @@ Luego cambia los valores:
     rating: 1300,                    // dificultad, en ELO
     fen: 'PEGA-AQUÍ-TU-FEN',
     solution: ['Nf7+', 'Kg8', 'Nxd8'],
+    outcome: 'win',                  // 'mate' · 'win' · 'draw' — ver abajo
     theme:   { es: 'Tenedor de caballo', en: 'Knight fork' },
     explain: {
       es: 'Por qué funciona la jugada.',
@@ -63,6 +64,14 @@ La web las traduce sola al español al mostrarlas.
 Se alternan: la primera la juega quien resuelve, la segunda es la respuesta del
 rival, la tercera otra vez quien resuelve. Si el reto es de una sola jugada,
 pon una sola.
+
+**`outcome` dice qué consigue esa jugada:**
+
+- `'mate'` — termina en jaque mate. El motor lo comprueba de verdad.
+- `'win'` — gana material o la partida, sin llegar a mate.
+- `'draw'` — salva tablas, es una jugada de defensa. **Esta es la única que no
+  se puede comprobar sola** (haría falta una tabla de finales): se publica
+  confiando en el criterio de quien la manda.
 
 ### 4 · Guarda
 
