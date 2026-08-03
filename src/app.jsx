@@ -1399,18 +1399,21 @@ function App() {
               >
                 <h3 className="display text-lg font-black leading-tight">{f.n}</h3>
                 <p className="mt-2 text-sm text-ivory/60 leading-relaxed flex-1">{f.d}</p>
+                {/* Los dos dan clases por separado: este botón no manda el mensaje
+                    directo a nadie en concreto, baja a elegir con quién. */}
                 <a
-                  href={`https://ig.me/m/${IG_WFM}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="#elige-profe"
                   className="mt-5 text-center bg-gold/10 ring-1 ring-gold/40 text-gold text-sm font-bold py-2.5 hover:bg-gold hover:text-ink transition"
                 >
-                  {t.classCta} ↗
+                  {t.classCta} ↓
                 </a>
               </div>
             ))}
           </div>
-          <div className="reveal mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 bg-panel ring-1 ring-line p-4">
+          <div
+            id="elige-profe"
+            className="reveal mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 bg-panel ring-1 ring-line p-4 scroll-mt-24"
+          >
             <p className="text-sm text-ivory/60 w-full">{t.chooseCoach}</p>
             <a
               href={`https://ig.me/m/${IG_WFM}`}
