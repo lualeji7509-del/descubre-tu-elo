@@ -1,6 +1,6 @@
 # RETOMAR — dónde nos quedamos
 
-> Última sesión: **1 de agosto de 2026**.
+> Última sesión: **3 de agosto de 2026** (noche).
 > Léelo antes de tocar nada. Resume el estado real del proyecto.
 
 ---
@@ -21,25 +21,43 @@ Se publica solo: cada `git push` a `main` actualiza la web en 1–2 minutos.
 **Hecho y publicado:**
 
 - Tablero jugable de verdad (tocar o arrastrar), con validación por motor.
-- 9 puzzles verificados: 5 de nivel WFM (1000–1600) y 4 de nivel GM (2050–2400).
+- 10 puzzles verificados: 5 de nivel WFM (1000–1600) y 5 de nivel GM
+  (2050–2400). El décimo lo mandó José Gabriel de verdad, con el formulario.
+- Cada puzzle dice qué consigue (`outcome`): mate, gana material, o tablas.
+  Los mates se comprueban con el motor al 100%; las tablas no —haría falta
+  una tabla de finales, no disponible aquí— así que esas se publican
+  confiando en el criterio de quien las manda.
 - ELO estimado calculado a partir de la dificultad real de cada puzzle.
 - Bilingüe español / inglés con selector; arranca en el idioma del móvil.
 - Piezas Cburnett, las mismas que usan ellos en Instagram.
 - Fotos de los dos y la foto conjunta de la Torre Eiffel.
 - Secciones: portada, Los maestros, El reto, Historia, Consejos, Clases,
-  En directo y pie con derechos reservados.
-- Un solo archivo `index.html` sin ninguna petición a internet.
+  En directo (ya menciona TikTok) y pie con derechos reservados.
+- **Vista previa al compartir el enlace** (`og.png`): al pegarlo en WhatsApp
+  sale con foto y titular, no como una línea de texto sola. Cómo rehacerla:
+  [`og/LEEME.md`](og/LEEME.md).
+- **`aportar.html`**: formulario para que Manuela y José Gabriel manden sus
+  propios retos sin tocar código ni GitHub. No está enlazado desde la
+  portada a propósito — es una herramienta para ellos dos, no pública.
+  Enlace: <https://lualeji7509-del.github.io/descubre-tu-elo/aportar.html>
+- Los botones de «Consultar disponibilidad» en Clases ya no escriben siempre
+  a Manuela: bajan a elegir con quién.
+- Un solo archivo `index.html` sin ninguna petición a internet (la web en
+  sí; `aportar.html` y `og.png` son archivos aparte, ver «Los archivos»).
 
-**En curso:** nada abierto. La sesión se cerró esperando respuesta de ellos.
+**En curso:** nada abierto. Esperando que José Gabriel confirme mañana que
+ve su puzzle bien en la web — si dice que no, revisar primero si de verdad
+se publicó (el aviso de despliegue de GitHub tardó en confirmarse la última
+vez, ver DECISIONES).
 
 **Pendiente, y depende de ELLOS (no de programar):**
 
 1. **Precios y forma de reserva de las clases.** Ahora la web dice que se
-   acuerda por mensaje privado y enlaza al DM de Manuela. No hay precios
-   inventados y no debe haberlos hasta que ella los dé.
-2. **Canales de Twitch o YouTube.** La sección «En directo» enlaza a sus
-   perfiles de Instagram y avisa de que si comparten canal, aparecerá ahí.
-   No inventar canales.
+   acuerda por mensaje privado y deja elegir a quién escribir (Manuela o José
+   Gabriel). No hay precios inventados y no debe haberlos hasta que los den.
+2. **El usuario de TikTok de José Gabriel.** Hizo un directo el 2 de agosto;
+   la sección «En directo» ya menciona TikTok además de Twitch y YouTube,
+   pero falta el enlace real. No inventar el usuario, hay que pedírselo.
 3. **La partida de Manuela en el Open de Aix-en-Provence.** Publicó la
    posición en Instagram (Jonathan Pierre-Mauzole 1696 vs WFM Manuela
    Hernández 1921, 0-1, «encuentra la táctica de 1 jugada»). Si pasa la
@@ -85,6 +103,16 @@ Se publica solo: cada `git push` a `main` actualiza la web en 1–2 minutos.
 - **Verificar el ajedrez antes que la interfaz.** `verify.mjs` se escribió
   ANTES que la app y encontró dos errores reales en los puzzles. Si se manda
   ajedrez malo a un GM de 2518, se acabó la conversación.
+- **Cada puzzle dice si termina en mate, gana o tablas (`outcome`).** Surgió
+  el 3 de agosto porque el primer puzzle real que mandó José Gabriel salvaba
+  tablas, no ganaba ni daba mate, y la web no tenía manera de decirlo.
+  Volvió a pasar lo mismo que con `verify.mjs`: al marcar los 9 puzzles
+  viejos como `'mate'` sin mirarlos uno a uno, **el propio verificador
+  encontró que dos estaban mal etiquetados** (ganan una pieza, no dan mate).
+  Las tablas son la única parte que el motor no puede comprobar solo.
+- **La ficha FIDE de Manuela** (`ratings.fide.com/profile/4483103`, enlazada
+  en la web) la confirmó Luis directamente el 3 de agosto. No se inventó ni
+  se dio por buena sin que él la mirara.
 
 ---
 
@@ -110,6 +138,13 @@ comprobaciones: los dos idiomas, resolver los 5 puzzles moviendo piezas,
 el arrastre, el aviso de jugada incorrecta, el resultado y el botón de
 compartir. También verifica que la página no hace ninguna petición de red.
 
+**Pruebas del formulario:** `node test-aportar.cjs` (mismo Playwright). Son
+15 comprobaciones sobre `aportar.html`: valida que avise sin romperse con
+datos vacíos o un FEN mal escrito, que arme el mensaje bien en los tres
+casos (mate/gana/tablas) y en las dos ramas de partida real, que el botón
+de copiar deje el texto exacto en el portapapeles y que el enlace de
+WhatsApp no lleve ningún número fijo.
+
 ---
 
 ## Los archivos
@@ -122,12 +157,20 @@ compartir. También verifica que la página no hace ninguna petición de red.
 | `img/*.jpg` | Fotos de los maestros. |
 | `verify.mjs` | Valida los puzzles con el motor. |
 | `build.mjs` | Genera `index.html`. |
-| `test-e2e.cjs` | Pruebas de navegador. |
-| `index.html` | **Generado.** No se edita a mano. |
+| `test-e2e.cjs` | Pruebas de navegador de la web. |
+| `aportar.html` | Formulario para que Manuela y José Gabriel manden retos sin código. No enlazado desde la portada. |
+| `test-aportar.cjs` | Pruebas de navegador de `aportar.html`. |
+| `og/plantilla.html` · `og.png` | La tarjeta con foto que sale al compartir el enlace. Cómo rehacerla: `og/LEEME.md`. |
+| `index.html` · `og.png` | **Generados.** No se editan a mano. |
 
 ---
 
 ## Por dónde retomar
 
-Cuando ellos contesten: meter precios y canales en `src/app.jsx` (objeto `T`),
-y la partida de Manuela en `puzzles.js`. Nada más está bloqueado.
+1. **Primero:** confirmar con José Gabriel que ve su puzzle bien en la web
+   (mensaje de «¡Tablas conseguidas!», no «¡Resuelto!»).
+2. Cuando contesten: meter precios y canales en `src/app.jsx` (objeto `T`),
+   el usuario de TikTok de José Gabriel, y la partida de Manuela en
+   `puzzles.js`. Nada más está bloqueado.
+3. Si Manuela también quiere mandar un reto: pasarle el enlace de
+   `aportar.html`, igual que a José Gabriel.

@@ -101,6 +101,7 @@ Es orientativo y con fines divulgativos: **no es un ELO oficial FIDE**.
 | [`verify.mjs`](verify.mjs) | Comprueba que los puzzles son correctos. |
 | [`build.mjs`](build.mjs) | Genera el archivo final. |
 | [`og/`](og/LEEME.md) | La tarjeta con foto que sale al compartir el enlace. |
+| [`aportar.html`](aportar.html) | Formulario para que Manuela y José Gabriel manden retos sin código. |
 | [`.github/workflows/publicar.yml`](.github/workflows/publicar.yml) | Revisa y publica sola la web en cada cambio. |
 | `index.html` · `og.png` | **Generados.** No se editan a mano. |
 
