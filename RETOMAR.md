@@ -45,6 +45,8 @@ Se publica solo: cada `git push` a `main` actualiza la web en 1–2 minutos.
   Enlace: <https://lualeji7509-del.github.io/descubre-tu-elo/aportar.html>
 - Los botones de «Consultar disponibilidad» en Clases ya no escriben siempre
   a Manuela: bajan a elegir con quién.
+- **Los dos maestros enlazan ya su ficha FIDE** en «Los maestros». La de José
+  Gabriel faltaba (`fide: null`) y se añadió el 4 de agosto.
 - Un solo archivo `index.html` sin ninguna petición a internet (la web en
   sí; `aportar.html` y `og.png` son archivos aparte, ver «Los archivos»).
 
@@ -117,6 +119,10 @@ falta que confirme que lo ve bien en la web, igual que a José Gabriel.
 - **La ficha FIDE de Manuela** (`ratings.fide.com/profile/4483103`, enlazada
   en la web) la confirmó Luis directamente el 3 de agosto. No se inventó ni
   se dio por buena sin que él la mirara.
+- **La ficha FIDE de José Gabriel** (`ratings.fide.com/profile/4430492`) la
+  confirmó Luis el 4 de agosto con una captura de la web de FIDE (Cardoso
+  Cardoso, Jose Gabriel · 2518 · Grandmaster). Igual que con Manuela: no se
+  buscó sola, `ratings.fide.com` está bloqueado desde este entorno.
 
 ---
 
