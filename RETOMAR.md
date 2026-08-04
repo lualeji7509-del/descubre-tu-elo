@@ -75,6 +75,17 @@ publicó (el aviso de despliegue de GitHub tardó en confirmarse la última
 vez, ver DECISIONES). Manuela ya mandó su primer reto (4 ago, ver arriba);
 falta que confirme que lo ve bien en la web, igual que a José Gabriel.
 
+**Aviso para quien retome (4 ago, noche):** Luis dijo que va a **quitar
+algunos puzzles y montar otros nuevos** que le pasaron Manuela y José
+Gabriel — fuera de esta sesión, antes de la próxima. Si al abrir el
+proyecto `puzzles.js` tiene puzzles distintos a los 11 descritos arriba (o
+un número distinto), **eso es lo normal, no un error**: lo primero es
+correr `npm run verify` para ver qué hay de verdad, no fiarse de este
+recuento. Si mete los puzzles a mano sin pasar por `npm run verify` +
+`npm run build`, revisar antes de nada que `index.html` esté regenerado y
+que el `outcome` de cada uno esté puesto (mate/win/draw) — son los dos
+fallos que ya pasaron antes con puzzles nuevos.
+
 **Pendiente, y depende de ELLOS (no de programar):**
 
 1. **Precios y forma de reserva de las clases.** Ahora la web dice que se
