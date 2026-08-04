@@ -21,6 +21,12 @@ Se publica solo: cada `git push` a `main` actualiza la web en 1–2 minutos.
 **Hecho y publicado:**
 
 - Tablero jugable de verdad (tocar o arrastrar), con validación por motor.
+- **Menú «ir directo a un problema»**: antes había que resolverlos en orden
+  para llegar al siguiente; ahora hay una fila de números que salta a
+  cualquiera directamente (los resueltos se marcan con ✓, sin enseñar el
+  tema — no da pistas). Surgió porque Manuela no encontraba su propio
+  puzzle nuevo entre los demás. «Siguiente problema» sigue existiendo y
+  ahora lleva siempre a uno sin resolver, venga de donde venga el salto.
 - 11 puzzles verificados: 5 de nivel WFM (1000–1600) y 6 de nivel GM
   (2050–2400). El décimo lo mandó José Gabriel de verdad, con el formulario,
   y el undécimo lo mandó Manuela: una combinación real suya de jaques

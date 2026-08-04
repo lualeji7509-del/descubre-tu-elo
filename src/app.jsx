@@ -85,6 +85,7 @@ const T = {
     shown: 'Ésta era la solución',
     next: 'Siguiente problema',
     seeResult: 'Ver mi ELO',
+    jumpTo: 'Ir directo a un problema:',
     tapHint: 'Toca una pieza y luego su destino. También puedes arrastrarla.',
 
     yourElo: 'Tu ELO estimado',
@@ -271,6 +272,7 @@ const T = {
     shown: 'This was the solution',
     next: 'Next puzzle',
     seeResult: 'See my ELO',
+    jumpTo: 'Jump straight to a puzzle:',
     tapHint: 'Tap a piece, then its destination. You can also drag it.',
 
     yourElo: 'Your estimated ELO',
@@ -650,7 +652,11 @@ function App() {
   const [stage, setStage] = useState('pick');
   const [queue, setQueue] = useState([]);
   const [idx, setIdx] = useState(0);
-  const [results, setResults] = useState([]);
+  /* Guardados por posición en la cola, no por orden de resolución: así se
+     puede saltar de un problema a otro (menú de números) sin duplicar ni
+     perder resultados si se vuelve a abrir uno ya resuelto. */
+  const [resultsByIdx, setResultsByIdx] = useState({});
+  const results = useMemo(() => Object.values(resultsByIdx), [resultsByIdx]);
   const [toast, setToast] = useState('');
 
   const t = T[lang];
@@ -691,10 +697,19 @@ function App() {
     setLevel(lv);
     setQueue(list);
     setIdx(0);
-    setResults([]);
+    setResultsByIdx({});
     setStage('play');
     loadPuzzle(list[0]);
     setTimeout(toQuiz, 60);
+  }
+
+  /* Saltar a cualquier problema de la cola (menú de números), en vez de
+     tener que resolverlos en orden. Se ignora en medio de la animación
+     de la jugada del rival (phase 'busy') para no cortarla a mitad. */
+  function goTo(n) {
+    if (n === idx || phase === 'busy') return;
+    setIdx(n);
+    loadPuzzle(queue[n]);
   }
 
   function attempt(from, to) {
@@ -759,7 +774,7 @@ function App() {
       ? (esTablas ? t.solvedCleanDraw : t.solvedClean)
       : (esTablas ? t.solvedDraw : t.solved);
     setMsg({ kind: 'ok', text: solved ? textoSolved : t.shown });
-    setResults((r) => [...r, { rating: puzzle.rating, solved, mistakes }]);
+    setResultsByIdx((r) => ({ ...r, [idx]: { rating: puzzle.rating, solved, mistakes } }));
   }
 
   function reveal() {
@@ -790,15 +805,21 @@ function App() {
     setSelected(null);
   }
 
+  /* Avanza al siguiente problema SIN resolver (no simplemente idx+1): así,
+     venga de donde venga el salto por el menú de números, siempre lleva a
+     algo nuevo. Da la vuelta al principio si hace falta. Sólo pasa al
+     resultado cuando los tiene todos intentados. */
   function next() {
-    const n = idx + 1;
-    if (n >= queue.length) {
-      setStage('result');
-      setTimeout(toQuiz, 60);
-      return;
+    for (let k = 1; k <= queue.length; k++) {
+      const cand = (idx + k) % queue.length;
+      if (!(cand in resultsByIdx)) {
+        setIdx(cand);
+        loadPuzzle(queue[cand]);
+        return;
+      }
     }
-    setIdx(n);
-    loadPuzzle(queue[n]);
+    setStage('result');
+    setTimeout(toQuiz, 60);
   }
 
   /* arrastre / drag */
@@ -1193,8 +1214,40 @@ function App() {
               <div className="h-1.5 bg-black/40 rounded-full overflow-hidden mb-4">
                 <div
                   className="h-full bg-gradient-to-r from-gold to-amber-200 transition-all duration-500"
-                  style={{ width: `${(idx / queue.length) * 100}%` }}
+                  style={{ width: `${(Object.keys(resultsByIdx).length / queue.length) * 100}%` }}
                 />
+              </div>
+
+              {/* Menú de números: salta a cualquier problema de la cola sin tener
+                  que resolver los anteriores. No enseña el tema, sólo el número
+                  y si ya se resolvió (✓), para no dar ninguna pista. */}
+              <div className="mb-4">
+                <p className="text-[11px] uppercase tracking-wider text-ivory/40 mb-1.5">{t.jumpTo}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {queue.map((_, n) => {
+                    const done = resultsByIdx[n];
+                    return (
+                      <button
+                        key={n}
+                        onClick={() => goTo(n)}
+                        aria-label={`${t.problem} ${n + 1}`}
+                        aria-current={n === idx ? 'true' : undefined}
+                        className={
+                          'w-8 h-8 shrink-0 text-xs font-bold tabular-nums transition active:scale-[.95] ' +
+                          (n === idx
+                            ? 'bg-gold text-ink ring-2 ring-gold'
+                            : done
+                              ? done.solved
+                                ? 'bg-emerald-400/20 text-emerald-300 ring-1 ring-emerald-400/40'
+                                : 'bg-white/10 text-ivory/50 ring-1 ring-line'
+                              : 'bg-white/5 text-ivory/70 ring-1 ring-line hover:ring-gold/50')
+                        }
+                      >
+                        {done && done.solved ? '✓' : n + 1}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* El tema se revela al terminar: enseñarlo antes sería dar la pista. */}
@@ -1261,7 +1314,7 @@ function App() {
                   onClick={next}
                   className="mt-3 w-full bg-gradient-to-r from-gold to-amber-300 text-ink font-black py-3.5  active:scale-[.98] transition"
                 >
-                  {idx === queue.length - 1 ? t.seeResult : t.next}
+                  {Object.keys(resultsByIdx).length >= queue.length ? t.seeResult : t.next}
                 </button>
               )}
             </div>
