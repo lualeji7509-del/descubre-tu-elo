@@ -8,6 +8,7 @@ const { Chess } = ChessLib;
 const IG_WFM = 'wfm_manuchess';
 const IG_GM = 'gmcardosolab';
 const FIDE_WFM = 'https://ratings.fide.com/profile/4483103';
+const FIDE_GM = 'https://ratings.fide.com/profile/4430492';
 const ANIO = new Date().getFullYear();
 const SITIO = 'https://lualeji7509-del.github.io/descubre-tu-elo/';
 
@@ -948,7 +949,7 @@ function App() {
       elo: 2518,
       bio: t.gmBio,
       ig: IG_GM,
-      fide: null,
+      fide: FIDE_GM,
       piece: 'q',
       accent: 'text-gold',
       foto: (window.FOTOS || {}).cardoso,
