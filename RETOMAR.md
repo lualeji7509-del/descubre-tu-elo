@@ -1,6 +1,6 @@
 # RETOMAR — dónde nos quedamos
 
-> Última sesión: **3 de agosto de 2026** (noche).
+> Última sesión: **4 de agosto de 2026**.
 > Léelo antes de tocar nada. Resume el estado real del proyecto.
 
 ---
@@ -21,8 +21,11 @@ Se publica solo: cada `git push` a `main` actualiza la web en 1–2 minutos.
 **Hecho y publicado:**
 
 - Tablero jugable de verdad (tocar o arrastrar), con validación por motor.
-- 10 puzzles verificados: 5 de nivel WFM (1000–1600) y 5 de nivel GM
-  (2050–2400). El décimo lo mandó José Gabriel de verdad, con el formulario.
+- 11 puzzles verificados: 5 de nivel WFM (1000–1600) y 6 de nivel GM
+  (2050–2400). El décimo lo mandó José Gabriel de verdad, con el formulario,
+  y el undécimo lo mandó Manuela: una combinación real suya de jaques
+  forzados (2300) contra Susana de Prada, Open Internacional de Benasque
+  2026 — gana material/partida, no es mate.
 - Cada puzzle dice qué consigue (`outcome`): mate, gana material, o tablas.
   Los mates se comprueban con el motor al 100%; las tablas no —haría falta
   una tabla de finales, no disponible aquí— así que esas se publican
@@ -45,10 +48,11 @@ Se publica solo: cada `git push` a `main` actualiza la web en 1–2 minutos.
 - Un solo archivo `index.html` sin ninguna petición a internet (la web en
   sí; `aportar.html` y `og.png` son archivos aparte, ver «Los archivos»).
 
-**En curso:** nada abierto. Esperando que José Gabriel confirme mañana que
-ve su puzzle bien en la web — si dice que no, revisar primero si de verdad
-se publicó (el aviso de despliegue de GitHub tardó en confirmarse la última
-vez, ver DECISIONES).
+**En curso:** nada abierto. Esperando que José Gabriel confirme que ve su
+puzzle bien en la web — si dice que no, revisar primero si de verdad se
+publicó (el aviso de despliegue de GitHub tardó en confirmarse la última
+vez, ver DECISIONES). Manuela ya mandó su primer reto (4 ago, ver arriba);
+falta que confirme que lo ve bien en la web, igual que a José Gabriel.
 
 **Pendiente, y depende de ELLOS (no de programar):**
 
@@ -172,5 +176,6 @@ WhatsApp no lleve ningún número fijo.
 2. Cuando contesten: meter precios y canales en `src/app.jsx` (objeto `T`),
    el usuario de TikTok de José Gabriel, y la partida de Manuela en
    `puzzles.js`. Nada más está bloqueado.
-3. Si Manuela también quiere mandar un reto: pasarle el enlace de
-   `aportar.html`, igual que a José Gabriel.
+3. ~~Si Manuela también quiere mandar un reto~~ → **hecho el 4 ago**: mandó
+   su combinación real contra Susana de Prada (Benasque 2026), publicada.
+   Falta que confirme que la ve bien en la web.
