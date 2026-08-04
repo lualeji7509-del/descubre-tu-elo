@@ -486,7 +486,10 @@ function Board({
       {ranks.map((rank) =>
         files.map((file) => {
           const sq = file + rank;
-          const dark = (FILES.indexOf(file) + rank) % 2 === 0;
+          /* a1 es casilla oscura y h1 clara — la norma universal de todo tablero
+             real es "casilla clara a la derecha de cada jugador". Con índice de
+             columna 0-based (a=0) eso es: oscura cuando índice+fila es IMPAR. */
+          const dark = (FILES.indexOf(file) + rank) % 2 === 1;
           const piece = pieceAt(sq);
           const isTarget = targets.includes(sq);
           const Cell = decorative ? 'div' : 'button';
@@ -1203,6 +1206,12 @@ function App() {
 
           {stage === 'play' && puzzle && (
             <div className="bg-panel p-5 sm:p-7 ring-1 ring-line">
+              <button
+                onClick={() => setStage('pick')}
+                className="mb-3 text-xs text-ivory/50 hover:text-gold transition flex items-center gap-1"
+              >
+                ← {t.changeLevel}
+              </button>
               <div className="flex items-center justify-between text-xs text-ivory/50 mb-2 tabular-nums">
                 <span>
                   {t.problem} {idx + 1} {t.of} {queue.length}

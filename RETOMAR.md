@@ -21,6 +21,16 @@ Se publica solo: cada `git push` a `main` actualiza la web en 1–2 minutos.
 **Hecho y publicado:**
 
 - Tablero jugable de verdad (tocar o arrastrar), con validación por motor.
+- **Colores del tablero corregidos.** Estaban al revés: la fórmula pintaba
+  a1 clara y h1 oscura. La norma real de cualquier tablero (la que siguen
+  lichess y todo tablero físico) es «casilla clara a la DERECHA de cada
+  jugador»: a1 oscura, h1 clara — y por tanto también h8 oscura / a8 clara
+  cuando juegan las negras. Comprobado con el color de fondo real en
+  navegador, en los dos casos (blancas y negras).
+- **Se puede volver a elegir maestro en pleno reto.** Antes, una vez dentro
+  de un problema no había forma de volver a «Elige tu nivel» sin recargar
+  la página; el botón «Cambiar de nivel» sólo aparecía al terminar los 5/6.
+  Ahora está también arriba del tablero, en todo momento.
 - **Menú «ir directo a un problema»**: antes había que resolverlos en orden
   para llegar al siguiente; ahora hay una fila de números que salta a
   cualquiera directamente (los resueltos se marcan con ✓, sin enseñar el
