@@ -63,6 +63,9 @@ Se publica solo: cada `git push` a `main` actualiza la web en 1–2 minutos.
   a Manuela: bajan a elegir con quién.
 - **Los dos maestros enlazan ya su ficha FIDE** en «Los maestros». La de José
   Gabriel faltaba (`fide: null`) y se añadió el 4 de agosto.
+- **«En directo» enlaza ya el TikTok de los dos**, además de Instagram —
+  confirmados con captura antes de añadirlos, no adivinados por parecerse al
+  usuario de Instagram.
 - Un solo archivo `index.html` sin ninguna petición a internet (la web en
   sí; `aportar.html` y `og.png` son archivos aparte, ver «Los archivos»).
 
@@ -77,9 +80,10 @@ falta que confirme que lo ve bien en la web, igual que a José Gabriel.
 1. **Precios y forma de reserva de las clases.** Ahora la web dice que se
    acuerda por mensaje privado y deja elegir a quién escribir (Manuela o José
    Gabriel). No hay precios inventados y no debe haberlos hasta que los den.
-2. **El usuario de TikTok de José Gabriel.** Hizo un directo el 2 de agosto;
-   la sección «En directo» ya menciona TikTok además de Twitch y YouTube,
-   pero falta el enlace real. No inventar el usuario, hay que pedírselo.
+2. ~~El usuario de TikTok de José Gabriel~~ → **hecho el 4 ago**: los dos
+   TikTok (`wfm_manuchess` y `gmcardosolab`) confirmados por Luis con
+   capturas del perfil real (bio y foto coinciden) y enlazados en «En
+   directo», junto al de Instagram.
 3. **La partida de Manuela en el Open de Aix-en-Provence.** Publicó la
    posición en Instagram (Jonathan Pierre-Mauzole 1696 vs WFM Manuela
    Hernández 1921, 0-1, «encuentra la táctica de 1 jugada»). Si pasa la

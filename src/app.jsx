@@ -9,6 +9,11 @@ const IG_WFM = 'wfm_manuchess';
 const IG_GM = 'gmcardosolab';
 const FIDE_WFM = 'https://ratings.fide.com/profile/4483103';
 const FIDE_GM = 'https://ratings.fide.com/profile/4430492';
+/* Los dos TikTok confirmados por Luis con capturas del perfil real
+   (bio y foto coinciden con cada uno: "Colombia's #1 Chess Player" /
+   "WFM · Estudiante de Marketing en UTRGV · De Colombia"). */
+const TIKTOK_WFM = 'wfm_manuchess';
+const TIKTOK_GM = 'gmcardosolab';
 const ANIO = new Date().getFullYear();
 const SITIO = 'https://lualeji7509-del.github.io/descubre-tu-elo/';
 
@@ -136,9 +141,7 @@ const T = {
     liveTitle: 'En directo',
     liveLead:
       'Torneos, partidas comentadas y anuncios de clases: todo lo publican en sus perfiles. Síguelos para no perdértelo.',
-    liveFollow: 'Seguir',
-    liveSoon:
-      '¿Tienen canal de TikTok, Twitch o YouTube? Cuando lo compartan, aparecerá aquí.',
+    liveSoon: '¿Tienen canal de Twitch o YouTube? Cuando lo compartan, aparecerá aquí.',
 
     footerRights: 'Todos los derechos reservados.',
     photoCaption: 'Manuela y José Gabriel, partida improvisada bajo la Torre Eiffel.',
@@ -322,9 +325,7 @@ const T = {
     liveTitle: 'Live',
     liveLead:
       'Tournaments, annotated games and lesson announcements all go up on their profiles. Follow them so you do not miss it.',
-    liveFollow: 'Follow',
-    liveSoon:
-      'Do they have a TikTok, Twitch or YouTube channel? Once they share it, it will show up here.',
+    liveSoon: 'Do they have a Twitch or YouTube channel? Once they share it, it will show up here.',
 
     footerRights: 'All rights reserved.',
     photoCaption: 'Manuela and José Gabriel, an impromptu game under the Eiffel Tower.',
@@ -961,6 +962,7 @@ function App() {
       bio: t.wfmBio,
       ig: IG_WFM,
       fide: FIDE_WFM,
+      tiktok: TIKTOK_WFM,
       piece: 'n',
       accent: 'text-gold',
       foto: (window.FOTOS || {}).manuela,
@@ -974,6 +976,7 @@ function App() {
       bio: t.gmBio,
       ig: IG_GM,
       fide: FIDE_GM,
+      tiktok: TIKTOK_GM,
       piece: 'q',
       accent: 'text-gold',
       foto: (window.FOTOS || {}).cardoso,
@@ -1510,13 +1513,7 @@ function App() {
         <Section id="directos" eyebrow="06" title={t.liveTitle} lead={t.liveLead}>
           <div className="grid gap-3 sm:grid-cols-2">
             {masters.map((m) => (
-              <a
-                key={m.key}
-                href={`https://instagram.com/${m.ig}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="reveal group bg-panel ring-1 ring-line p-5 flex items-center gap-4 hover:ring-gold/40 transition"
-              >
+              <div key={m.key} className="reveal bg-panel ring-1 ring-line p-5 flex items-center gap-4">
                 {m.foto && (
                   <img
                     src={m.foto}
@@ -1529,12 +1526,28 @@ function App() {
                 )}
                 <span className="flex-1 min-w-0">
                   <span className="block font-black leading-tight">{m.name}</span>
-                  <span className="block t-label text-ivory/35 mt-1">@{m.ig}</span>
+                  <span className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+                    <a
+                      href={`https://instagram.com/${m.ig}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="t-label text-gold hover:translate-x-0.5 transition inline-block"
+                    >
+                      Instagram @{m.ig} ↗
+                    </a>
+                    {m.tiktok && (
+                      <a
+                        href={`https://tiktok.com/@${m.tiktok}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="t-label text-gold hover:translate-x-0.5 transition inline-block"
+                      >
+                        TikTok @{m.tiktok} ↗
+                      </a>
+                    )}
+                  </span>
                 </span>
-                <span className="t-label text-gold shrink-0 group-hover:translate-x-1 transition">
-                  {t.liveFollow} ↗
-                </span>
-              </a>
+              </div>
             ))}
           </div>
           <p className="reveal mt-4 text-xs text-ivory/35 max-w-xl">{t.liveSoon}</p>
