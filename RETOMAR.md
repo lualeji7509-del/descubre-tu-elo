@@ -75,16 +75,55 @@ publicó (el aviso de despliegue de GitHub tardó en confirmarse la última
 vez, ver DECISIONES). Manuela ya mandó su primer reto (4 ago, ver arriba);
 falta que confirme que lo ve bien en la web, igual que a José Gabriel.
 
-**Aviso para quien retome (4 ago, noche):** Luis dijo que va a **quitar
-algunos puzzles y montar otros nuevos** que le pasaron Manuela y José
-Gabriel — fuera de esta sesión, antes de la próxima. Si al abrir el
-proyecto `puzzles.js` tiene puzzles distintos a los 11 descritos arriba (o
-un número distinto), **eso es lo normal, no un error**: lo primero es
-correr `npm run verify` para ver qué hay de verdad, no fiarse de este
-recuento. Si mete los puzzles a mano sin pasar por `npm run verify` +
-`npm run build`, revisar antes de nada que `index.html` esté regenerado y
-que el `outcome` de cada uno esté puesto (mate/win/draw) — son los dos
-fallos que ya pasaron antes con puzzles nuevos.
+**Aviso para quien retome (4 ago, noche) — tanda de puzzles A MEDIAS, sin
+tocar `puzzles.js` todavía:** Luis quiere quitar puzzles genéricos del
+nivel GM y montar 4 nuevos que le mandaron José Gabriel y Manuela. Se
+verificaron los 4 con el motor (`chess.js`, fuera de `puzzles.js`, sin
+publicar nada) y quedaron **3 preguntas sin responder** — no se avanza sin
+ellas, no se adivina:
+
+1. **José Gabriel dijo «borrar del 2 en adelante»** en el nivel GM. Sin
+   confirmar si es: (a) sólo los 3 mates genéricos (Legado de Philidor
+   2200, Mate de Anastasia 2300, Mate de Boden 2400) — dejando el 2050 y
+   los DOS reales que ya había (su defensa de torre y el de jaques
+   forzados de Manuela de hoy) — o (b) todo desde la posición 2, borrando
+   también esos dos reales.
+2. **Puzzle de José Gabriel, 1600, «Eliminación»:** `FEN
+   r1br2k1/p3pp1p/1q4p1/8/3N4/7P/PP3PP1/R2QR1K1 w - - 0 1`, jugada `Ae6`.
+   **Esa jugada no existe** — no hay ningún alfil blanco en el tablero. Se
+   comprobó que `Ce6` (el caballo de d4) sí es legal y sí gana material
+   (ataca dos veces la torre de d8: con el caballo y, al destaparla, con
+   la dama). Falta que José Gabriel confirme que quiso decir `Ce6`.
+3. **Puzzle de Manuela, 2000, «Amenaza de mate / jugada intermedia»:**
+   `FEN 1k6/4R1pp/r1P5/8/2Np3P/p1nP2P1/5PK1/8 b - - 0 0`. El FEN tiene DOS
+   fallos de escritura: dice que mueven negras (`b`) pero su jugada 1 es
+   un jaque de TORRE BLANCA (`1.Tb7+`), y el contador de jugada está en
+   `0` (imposible, empieza en 1). Corrigiendo a `w - - 0 1`, toda su
+   secuencia (`Tb7+ Ra8 Cb6+ Txb6 Txb6 Ra7 Tb7+`) es legal y termina
+   exactamente como ella explica (peón c avanzado, posición ganadora).
+   Falta que confirme esa lectura.
+
+**Los otros dos SÍ están verificados y listos para meter en cuanto se
+resuelva el punto 1** (dónde va cada uno en el array):
+
+- **José Gabriel, 2300, «Desviación»:** `FEN
+  8/2B3p1/7b/7p/7k/2q4P/Q5P1/7K w - - 0 1`, jugadas `Qf7 Be3 Qe7 g5 Kh2
+  Bg1 Kxg1 Qc1 Qe1 Qxe1 Kh2 Qf2 Bd6 Qf4 g3 Qxg3 Bxg3`. ⚠️ **Ojo:** José
+  Gabriel puso «gana material o la partida», pero el motor confirma que
+  **es mate de verdad** (`Bxg3#`). Va con `outcome: 'mate'` y la última
+  jugada con `#`, no como `'win'`.
+- **José Gabriel, 2000, «Jaques forzados» / peón pasado:** `FEN
+  8/6kp/3PQ1p1/8/1P6/1K6/3r2PP/2r5 w - - 0 1`, jugadas `Qe7 Kg8 Qd8 Kg7
+  Qc7`. La última jugada da jaque Y ataca la torre de c1 a la vez (doble
+  amenaza). `outcome: 'win'`, no mate.
+- Ninguno de los 4 lleva `source` (partida real) — los cuatro son
+  ejemplos construidos por ellos, confirmado explícitamente por cada uno
+  al mandarlo.
+
+**Antes de meterlos:** correr `npm run verify` de todas formas (por si al
+transcribir a mano se cuela un error nuevo) y `npm run build`, y jugarlo
+en un navegador real antes de dar por publicado — es el mismo proceso de
+siempre, no hay atajos por venir de ellos directamente.
 
 **Pendiente, y depende de ELLOS (no de programar):**
 
